@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buzzer Educativo</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Design system variables */
+            --color-white: rgba(255, 255, 255, 1);
+            --color-black: rgba(0, 0, 0, 1);
+            --color-cream-50: rgba(252, 252, 249, 1);
+            --color-cream-100: rgba(255, 255, 253, 1);
+            --color-gray-200: rgba(245, 245, 245, 1);
+            --color-gray-300: rgba(167, 169, 169, 1);
+            --color-gray-400: rgba(119, 124, 124, 1);
+            --color-slate-500: rgba(98, 108, 113, 1);
+            --color-brown-600: rgba(94, 82, 64, 1);
+            --color-charcoal-700: rgba(31, 33, 33, 1);
+            --color-charcoal-800: rgba(38, 40, 40, 1);
+            --color-slate-900: rgba(19, 52, 59, 1);
+            --color-teal-300: rgba(50, 184, 198, 1);
+            --color-teal-400: rgba(45, 166, 178, 1);
+            --color-teal-500: rgba(33, 128, 141, 1);
+            --color-teal-600: rgba(29, 116, 128, 1);
+            --color-teal-700: rgba(26, 104, 115, 1);
+            --color-red-400: rgba(255, 84, 89, 1);
+            --color-red-500: rgba(192, 21, 47, 1);
+            --color-orange-400: rgba(230, 129, 97, 1);
+            --color-orange-500: rgba(168, 75, 47, 1);
+            
+            --color-brown-600-rgb: 94, 82, 64;
+            --color-teal-500-rgb: 33, 128, 141;
+            --color-slate-900-rgb: 19, 52, 59;
+            --color-slate-500-rgb: 98, 108, 113;
+            --color-red-500-rgb: 192, 21, 47;
+            --color-red-400-rgb: 255, 84, 89;
+            --color-orange-500-rgb: 168, 75, 47;
+            
+            --color-bg-1: rgba(59, 130, 246, 0.08);
+            --color-bg-2: rgba(245, 158, 11, 0.08);
+            --color-bg-3: rgba(34, 197, 94, 0.08);
+            --color-bg-4: rgba(239, 68, 68, 0.08);
+            
+            --color-background: var(--color-cream-50);
+            --color-surface: var(--color-cream-100);
+            --color-text: var(--color-slate-900);
+            --color-text-secondary: var(--color-slate-500);
+            --color-primary: var(--color-teal-500);
+            --color-primary-hover: var(--color-teal-600);
+            --color-primary-active: var(--color-teal-700);
+            --color-secondary: rgba(var(--color-brown-600-rgb), 0.12);
+            --color-secondary-hover: rgba(var(--color-brown-600-rgb), 0.2);
+            --color-border: rgba(var(--color-brown-600-rgb), 0.2);
+            --color-btn-primary-text: var(--color-cream-50);
+            --color-card-border: rgba(var(--color-brown-600-rgb), 0.12);
+            --color-error: var(--color-red-500);
+            --color-success: var(--color-teal-500);
+            --color-warning: var(--color-orange-500);
+            
+            --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-size-sm: 12px;
+            --font-size-base: 14px;
+            --font-size-lg: 16px;
+            --font-size-xl: 18px;
+            --font-size-2xl: 20px;
+            --font-size-3xl: 24px;
+            --font-size-4xl: 30px;
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 550;
+            --font-weight-bold: 600;
+            
+            --space-4: 4px;
+            --space-8: 8px;
+            --space-12: 12px;
+            --space-16: 16px;
+            --space-20: 20px;
+            --space-24: 24px;
+            --space-32: 32px;
+            
+            --radius-sm: 6px;
+            --radius-base: 8px;
+            --radius-lg: 12px;
+            --radius-full: 9999px;
+            
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            
+            /* App specific colors - Enhanced palette */
+            --color-buzzer-inactive: #CCCCCC;
+            --color-buzzer-active: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+            --color-buzzer-pressed: linear-gradient(135deg, #4CAF50 0%, #45B649 100%);
+            --color-primary-vibrant: #FF6B35;
+            --color-secondary-vibrant: #F7931E;
+            --color-success-vibrant: #4CAF50;
+            --color-danger-vibrant: #FF5252;
+            --color-info-vibrant: #2196F3;
+            --color-bg-gradient: linear-gradient(135deg, #F5F7FA 0%, #C3CFE2 100%);
+            --color-card-gradient: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+            --color-glow: rgba(247, 147, 30, 0.6);
+            --color-shadow-primary: rgba(255, 107, 53, 0.4);
+            --color-shadow-active: rgba(255, 107, 53, 0.5);
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-background: var(--color-charcoal-700);
+                --color-surface: var(--color-charcoal-800);
+                --color-text: var(--color-gray-200);
+                --color-text-secondary: rgba(167, 169, 169, 0.7);
+                --color-primary: var(--color-teal-300);
+                --color-primary-hover: var(--color-teal-400);
+                --color-secondary: rgba(119, 124, 124, 0.15);
+                --color-secondary-hover: rgba(119, 124, 124, 0.25);
+                --color-border: rgba(119, 124, 124, 0.3);
+                --color-btn-primary-text: var(--color-slate-900);
+                --color-card-border: rgba(119, 124, 124, 0.2);
+                --color-error: var(--color-red-400);
+                --color-success: var(--color-teal-300);
+                --color-warning: var(--color-orange-400);
+                
+                /* Dark mode buzzer colors */
+                --color-buzzer-active: linear-gradient(135deg, #FF8A50 0%, #FFB347 100%);
+                --color-glow: rgba(255, 179, 71, 0.6);
+                --color-shadow-primary: rgba(255, 138, 80, 0.4);
+                --color-shadow-active: rgba(255, 138, 80, 0.5);
+            }
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        html, body {
+            font-family: 'Inter', var(--font-family-base);
+            font-size: var(--font-size-base);
+            background: var(--color-bg-gradient);
+            color: var(--color-text);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: var(--space-16);
+        }
+        
+        .screen {
+            display: none;
+        }
+        
+        .screen.active {
+            display: block;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: var(--space-32);
+        }
+        
+        .header h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: var(--font-size-4xl);
+            font-weight: 800;
+            margin-bottom: var(--space-8);
+            color: var(--color-primary-vibrant);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header p {
+            font-size: var(--font-size-lg);
+            color: var(--color-text-secondary);
+            font-weight: 500;
+        }
+        
+        .card {
+            background: var(--color-card-gradient);
+            border: 1px solid var(--color-card-border);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: var(--space-24);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-16) var(--space-24);
+            border: none;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            min-height: 48px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn--primary {
+            background: linear-gradient(135deg, var(--color-primary-vibrant) 0%, var(--color-secondary-vibrant) 100%);
+            color: white;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        }
+        
+        .btn--primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+        }
+        
+        .btn--secondary {
+            background: var(--color-secondary);
+            color: var(--color-text);
+        }
+        
+        .btn--secondary:hover:not(:disabled) {
+            background: var(--color-secondary-hover);
+        }
+        
+        .btn--danger {
+            background: linear-gradient(135deg, var(--color-danger-vibrant) 0%, #E57373 100%);
+            color: white;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 15px rgba(255, 82, 82, 0.3);
+        }
+        
+        .btn--danger:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 82, 82, 0.4);
+        }
+        
+        .btn--success {
+            background: linear-gradient(135deg, var(--color-success-vibrant) 0%, #45B649 100%);
+            color: white;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+        
+        .btn--success:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+        
+        .btn--warning {
+            background: var(--color-warning);
+            color: white;
+        }
+        
+        .btn--lg {
+            padding: var(--space-20) var(--space-32);
+            font-size: var(--font-size-xl);
+            min-height: 64px;
+        }
+        
+        .btn--xl {
+            padding: var(--space-32);
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-bold);
+            min-height: 120px;
+            width: 100%;
+        }
+        
+        .btn--full {
+            width: 100%;
+            margin-bottom: var(--space-16);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .form-group {
+            margin-bottom: var(--space-20);
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: var(--space-8);
+            font-weight: var(--font-weight-medium);
+            font-size: var(--font-size-base);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: var(--space-16);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            font-size: var(--font-size-base);
+            background: var(--color-surface);
+            color: var(--color-text);
+            min-height: 48px;
+        }
+        
+        .form-control:focus {
+            outline: 2px solid var(--color-primary);
+            border-color: var(--color-primary);
+        }
+        
+        .session-code {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: 3px solid #5a67d8;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: var(--space-24);
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.3);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .session-code::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+        
+        .session-code h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: var(--font-size-2xl);
+            font-weight: 600;
+            margin-bottom: var(--space-8);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .session-code .code {
+            font-family: 'Poppins', sans-serif;
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: 0.2em;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        
+        .students-list {
+            margin-bottom: var(--space-24);
+        }
+        
+        .students-list h3 {
+            font-size: var(--font-size-xl);
+            margin-bottom: var(--space-16);
+        }
+        
+        .student-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 12px;
+            margin-bottom: var(--space-8);
+            box-shadow: 0 2px 10px rgba(252, 182, 159, 0.3);
+            border: 1px solid rgba(252, 182, 159, 0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .student-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(252, 182, 159, 0.4);
+        }
+        
+        .student-name {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .student-score {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 16px;
+            color: var(--color-primary-vibrant);
+            background: rgba(255, 255, 255, 0.8);
+            padding: 4px 12px;
+            border-radius: 20px;
+            min-width: 60px;
+            text-align: center;
+        }
+        
+        .buzzer-status {
+            text-align: center;
+            padding: 30px;
+            margin-bottom: var(--space-24);
+            border-radius: 20px;
+            font-size: 32px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: var(--color-card-gradient);
+            border: 2px solid transparent;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .buzzer-status--waiting {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            color: var(--color-text-secondary);
+            border-color: #cbd5e1;
+        }
+        
+        .buzzer-status--active {
+            background: var(--color-buzzer-active);
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            animation: status-pulse 1.5s ease-in-out infinite;
+            border-color: #F7931E;
+            box-shadow: 0 8px 30px var(--color-shadow-active), 0 0 20px var(--color-glow);
+        }
+        
+        .buzzer-status--buzzed {
+            background: var(--color-buzzer-pressed);
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            border-color: #4CAF50;
+            animation: status-success 0.6s ease-out;
+        }
+        
+        .buzzer-status--finished {
+            background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+            color: #2e7d32;
+            border-color: #66bb6a;
+            animation: gentle-pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes gentle-pulse {
+            0%, 100% { opacity: 0.9; }
+            50% { opacity: 1; }
+        }
+        
+        @keyframes status-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes status-success {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Enhanced emoji and visual elements */
+        .emoji {
+            font-size: 1.5em;
+            margin-right: 8px;
+        }
+        
+        /* Student count animations and styling */
+        #student-count {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-block;
+        }
+        
+        /* Pulse animation for start session button */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Improved session code styling */
+        .session-code {
+            position: relative;
+        }
+        
+        .session-code::after {
+            content: '📱 Comparte este código con tus alumnos';
+            display: block;
+            font-size: var(--font-size-lg);
+            margin-top: var(--space-16);
+            padding: var(--space-12);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-base);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .student-position {
+            background: var(--color-card-gradient);
+            border: 2px solid var(--color-primary-vibrant);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        .position-number {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--color-primary-vibrant);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .position-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--color-text);
+            margin-top: 8px;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes scoreUpdate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        function createStudentScoreEffect(points) {
+            const scoreCard = document.querySelector('.score-display');
+            const effect = document.createElement('div');
+            effect.style.cssText = `
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                font-size: 24px;
+                font-weight: 800;
+                color: ${points > 0 ? '#4CAF50' : '#FF5252'};
+                z-index: 100;
+                pointer-events: none;
+                animation: floatUp 2s ease-out forwards;
+            `;
+            effect.textContent = points > 0 ? `+${points}` : `${points}`;
+            scoreCard.style.position = 'relative';
+            scoreCard.appendChild(effect);
+            
+            setTimeout(() => {
+                effect.remove();
+            }, 2000);
+        }
+        
+        const floatUpStyle = document.createElement('style');
+        floatUpStyle.textContent = `
+            @keyframes floatUp {
+                0% { transform: translateY(0) scale(1); opacity: 1; }
+                100% { transform: translateY(-50px) scale(0.8); opacity: 0; }
+            }
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(floatUpStyle);
+        
+        /* Score display enhancement */
+        .score-display {
+            background: var(--color-card-gradient);
+            border: 3px solid var(--color-success-vibrant);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        
+        .score-number {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--color-success-vibrant);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .score-label {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--color-text);
+            margin-top: 8px;
+        }
+        
+        /* MEGA BUZZER BUTTON STYLES */
+        .buzzer-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            min-height: 50vh;
+        }
+        
+        .buzzer-btn {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            border: none;
+            font-size: 28px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 40px auto;
+            text-align: center;
+            line-height: 1.2;
+        }
+        
+        .buzzer-btn--inactive {
+            background: #CCCCCC;
+            color: #666;
+            opacity: 0.6;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            cursor: not-allowed;
+        }
+        
+        .buzzer-btn--active {
+            background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            animation: buzzer-pulse 1.5s ease-in-out infinite;
+            box-shadow: 0 15px 40px rgba(255, 107, 53, 0.5), 0 0 30px rgba(247, 147, 30, 0.6);
+            cursor: pointer;
+        }
+        
+        .buzzer-btn--pressed {
+            background: linear-gradient(135deg, #4CAF50 0%, #45B649 100%);
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            animation: buzzer-success 0.6s ease-out;
+            cursor: not-allowed;
+        }
+        
+        .buzzer-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+        }
+        
+        .buzzer-btn:active:not(:disabled) {
+            transform: scale(0.95) rotate(2deg);
+        }
+        
+        .buzzer-btn:disabled {
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Buzzer animations */
+        @keyframes buzzer-pulse {
+            0% { 
+                transform: scale(1); 
+                box-shadow: 0 15px 40px rgba(255, 107, 53, 0.5), 0 0 30px rgba(247, 147, 30, 0.6);
+            }
+            50% { 
+                transform: scale(1.05); 
+                box-shadow: 0 20px 50px rgba(255, 107, 53, 0.7), 0 0 40px rgba(247, 147, 30, 0.8);
+            }
+            100% { 
+                transform: scale(1); 
+                box-shadow: 0 15px 40px rgba(255, 107, 53, 0.5), 0 0 30px rgba(247, 147, 30, 0.6);
+            }
+        }
+        
+        @keyframes buzzer-success {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.2) rotate(-5deg); }
+            50% { transform: scale(1.3) rotate(5deg); }
+            75% { transform: scale(1.1) rotate(-2deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+        
+        /* Confetti animation */
+        @keyframes confetti {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #FFD700;
+            animation: confetti 1s ease-out forwards;
+            pointer-events: none;
+        }
+        
+        /* Responsive buzzer sizes */
+        @media (max-width: 600px) {
+            .buzzer-btn {
+                width: 250px;
+                height: 250px;
+                font-size: 24px;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .buzzer-btn {
+                width: 350px;
+                height: 350px;
+                font-size: 32px;
+            }
+        }
+        
+        .round-controls {
+            text-align: center;
+            margin-bottom: var(--space-24);
+        }
+        
+        .timer {
+            font-family: 'Poppins', sans-serif;
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--color-primary-vibrant);
+            margin-bottom: var(--space-16);
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(252, 182, 159, 0.3);
+            border: 2px solid rgba(252, 182, 159, 0.5);
+        }
+        
+        .buzzer-queue {
+            margin-bottom: var(--space-24);
+        }
+        
+        .buzzer-queue h3 {
+            font-size: var(--font-size-xl);
+            margin-bottom: var(--space-16);
+        }
+        
+        .buzzer-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 12px;
+            margin-bottom: var(--space-8);
+            box-shadow: 0 2px 10px rgba(168, 237, 234, 0.3);
+            border: 1px solid rgba(168, 237, 234, 0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: slideInRight 0.5s ease-out;
+        }
+        
+        .buzzer-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(168, 237, 234, 0.4);
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .buzzer-position {
+            background: linear-gradient(135deg, var(--color-primary-vibrant) 0%, var(--color-secondary-vibrant) 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 18px;
+            box-shadow: 0 3px 10px rgba(255, 107, 53, 0.4);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        
+        .score-controls {
+            display: flex;
+            gap: var(--space-8);
+        }
+        
+        .score-btn {
+            padding: var(--space-4) var(--space-12);
+            font-size: var(--font-size-sm);
+            min-height: 36px;
+            border-radius: 8px;
+            font-weight: 700;
+            margin: 2px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .score-btn:hover {
+            transform: translateY(-1px);
+        }
+        
+        .scoreboard {
+            margin-top: var(--space-24);
+        }
+        
+        .scoreboard h3 {
+            font-size: var(--font-size-xl);
+            margin-bottom: var(--space-16);
+        }
+        
+        .error-message {
+            background: var(--color-bg-4);
+            color: var(--color-error);
+            padding: var(--space-16);
+            border-radius: var(--radius-base);
+            margin-bottom: var(--space-16);
+            border: 1px solid var(--color-error);
+        }
+        
+        .success-message {
+            background: var(--color-bg-3);
+            color: var(--color-success);
+            padding: var(--space-16);
+            border-radius: var(--radius-base);
+            margin-bottom: var(--space-16);
+            border: 1px solid var(--color-success);
+        }
+        
+        .back-btn {
+            margin-bottom: var(--space-24);
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .container {
+                padding: var(--space-12);
+            }
+            
+            .card {
+                padding: var(--space-16);
+            }
+            
+            .header h1 {
+                font-size: var(--font-size-3xl);
+            }
+            
+            .session-code .code {
+                font-size: var(--font-size-3xl);
+            }
+            
+            .score-controls {
+                flex-wrap: wrap;
+            }
+            
+            .student-item, .buzzer-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-8);
+            }
+        }
+    </style>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Pantalla Principal -->
+        <div id="home-screen" class="screen active">
+            <div class="header">
+                <h1>🔔 Buzzer Educativo</h1>
+                <p>Sistema interactivo para el aula moderna</p>
+            </div>
+            
+            <div class="card">
+                <button class="btn btn--primary btn--lg btn--full" onclick="irProfesor()">
+                    📚 SOY PROFESOR
+                </button>
+                <button class="btn btn--secondary btn--lg btn--full" onclick="irAlumno()">
+                    🎓 SOY ALUMNO
+                </button>
+            </div>
+        </div>
+        
+
+        
+        <!-- Unirse a Sesión -->
+        <div id="join-session-screen" class="screen">
+            <button class="btn btn--secondary back-btn" onclick="showHome()">← Volver</button>
+            
+            <div class="header">
+                <h1>🎓 Unirse a Sesión</h1>
+                <p>Introduce el código y tu nombre</p>
+            </div>
+            
+            <div class="card">
+                <div id="join-error" class="error-message" style="display: none;"></div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="session-code-input">Código de Sesión</label>
+                    <input type="text" id="session-code-input" class="form-control" placeholder="Ej: 123456" maxlength="6">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="student-name-input">Tu Nombre</label>
+                    <input type="text" id="student-name-input" class="form-control" placeholder="Ej: Ana López">
+                </div>
+                
+                <button class="btn btn--primary btn--lg btn--full" onclick="joinSession()">
+                    🎆 CONECTAR
+                </button>
+            </div>
+        </div>
+        
+        <!-- Vista del Profesor -->
+        <div id="teacher-screen" class="screen">
+            <button class="btn btn--secondary back-btn" onclick="endSession()">← Volver al Inicio</button>
+            
+            <div class="session-code">
+                <h2>Código de Sesión</h2>
+                <div class="code" id="session-code-display"></div>
+            </div>
+            
+            <div class="card">
+                <div class="students-list">
+                    <h3><span class="emoji">👥</span> Alumnos Conectados (<span id="student-count" style="color: var(--color-primary-vibrant); font-weight: 800;">0</span>)</h3>
+                    <div id="students-container"></div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="round-controls">
+                    <button id="round-btn" class="btn btn--success btn--lg btn--full" onclick="toggleRound()">
+                        INICIAR RONDA
+                    </button>
+                    <button class="btn btn--secondary btn--full" onclick="clearRound()" style="margin-top: var(--space-8);">
+                        Limpiar Ronda
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="buzzer-queue">
+                    <h3><span class="emoji">🏁</span> Orden de Respuestas</h3>
+                    <div id="buzzer-queue-container">
+                        <p style="color: var(--color-text-secondary); text-align: center; font-style: italic;">Ningún alumno ha presionado el buzzer aún</p>
+                    </div>
+                </div>
+            </div>
+            
+
+        </div>
+        
+        <!-- Vista del Alumno -->
+        <div id="student-screen" class="screen">
+            <button class="btn btn--secondary back-btn" onclick="showHome()">← Volver al Inicio</button>
+            
+            <div class="header">
+                <h1><span class="emoji">😊</span> ¡Hola, <span id="student-name-display"></span>!</h1>
+                <p><span class="emoji">🏫</span> Sesión: <span id="student-session-display" style="font-weight: 700; color: var(--color-primary-vibrant);"></span></p>
+            </div>
+            
+            <div class="card">
+                <div id="buzzer-status" class="buzzer-status buzzer-status--waiting">
+                    <span class="emoji">📝</span> Esperando que el profesor inicie la sesión...
+                </div>
+                
+                <div class="buzzer-container">
+                    <button id="buzzer-button" class="buzzer-btn buzzer-btn--inactive" onclick="pressBuzzer()" disabled>
+                        <span class="emoji">🔔</span> ¡PULSA AQUÍ!
+                    </button>
+                    
+                    <div id="session-waiting-message" style="text-align: center; color: var(--color-text-secondary); font-size: var(--font-size-lg); margin-top: var(--space-16);">
+                        <span class="emoji">⏳</span> Esperando que el profesor inicie la sesión...
+                    </div>
+                </div>
+                
+                <div id="student-position" class="student-position" style="display: none;">
+                    <div class="position-number" id="position-number">1</div>
+                    <div class="position-text">¡Tu posición en la cola!</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>⭐ Tu Puntuación</h3>
+                <div class="score-display">
+                    <div class="score-number" id="student-score-display">0</div>
+                    <div class="score-label">puntos</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Variables globales
+        let miCodigo = null;
+        let miNombre = null;
+        let miId = null;
+        let rondaActiva = false;
+        let listeners = [];
+
+        // Inicializar Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBgHLwmcUzb-Y3bK7e8I2z9n6T5oV3xR2Q",
+            authDomain: "buzzer-educativo-demo.firebaseapp.com",
+            databaseURL: "https://buzzer-educativo-demo-default-rtdb.firebaseio.com",
+            projectId: "buzzer-educativo-demo"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        
+        // Funciones de navegación
+        function mostrarPantalla(pantallaId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(pantallaId).classList.add('active');
+        }
+
+        function limpiarListeners() {
+            listeners.forEach(listener => {
+                if (listener.off) listener.off();
+            });
+            listeners = [];
+        }
+        
+        // Sistema de mensajes robusto
+        function mostrarMensaje(texto, tipo) {
+            // Eliminar mensaje anterior si existe
+            const anterior = document.getElementById('mensaje-flotante');
+            if (anterior) {
+                anterior.remove();
+            }
+            
+            const div = document.createElement('div');
+            div.id = 'mensaje-flotante';
+            div.textContent = texto;
+            div.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                border-radius: 10px;
+                font-weight: bold;
+                font-size: 16px;
+                z-index: 10000;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                animation: slideIn 0.3s ease;
+            `;
+            
+            if (tipo === 'exito') {
+                div.style.background = '#4CAF50';
+                div.style.color = 'white';
+            } else if (tipo === 'error') {
+                div.style.background = '#FF5252';
+                div.style.color = 'white';
+            } else if (tipo === 'info') {
+                div.style.background = '#2196F3';
+                div.style.color = 'white';
+            }
+            
+            document.body.appendChild(div);
+            
+            // Auto-eliminar después de 3 segundos
+            setTimeout(() => {
+                div.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => div.remove(), 300);
+            }, 3000);
+        }
+        
+        function mostrarError(texto) {
+            mostrarMensaje('❌ ' + texto, 'error');
+            console.error('❌', texto);
+            
+            // También mostrar en el área de error si existe
+            const errorEl = document.getElementById('join-error');
+            if (errorEl) {
+                errorEl.textContent = texto;
+                errorEl.style.display = 'block';
+                setTimeout(() => {
+                    errorEl.style.display = 'none';
+                }, 5000);
+            }
+        }
+        
+
+        
+        async function irProfesor() {
+            // Ocultar pantalla inicio
+            mostrarPantalla('teacher-screen');
+            
+            // Mostrar mensaje de carga
+            mostrarMensaje('Generando sesión...', 'info');
+            
+            // Generar sesión automáticamente
+            await crearSesionAutomatica();
+        }
+
+        function irAlumno() {
+            mostrarPantalla('join-session-screen');
+        }
+
+        function showHome() {
+            limpiarListeners();
+            mostrarPantalla('home-screen');
+            miCodigo = null;
+            miNombre = null;
+            miId = null;
+            rondaActiva = false;
+        }
+
+
+
+        function showJoinSession() {
+            mostrarPantalla('join-session-screen');
+        }
+        
+        // PROFESOR: Crear sesión automática
+        async function crearSesionAutomatica() {
+            try {
+                // Verificar conexión a Firebase primero
+                const conectado = await verificarConexionFirebase();
+                if (!conectado) {
+                    mostrarError('No hay conexión a Firebase. Verifica tu internet.');
+                    showHome();
+                    return;
+                }
+                
+                // Generar código único
+                const codigo = generarCodigoUnico();
+                miCodigo = codigo;
+                
+                console.log('🔢 Código generado:', codigo);
+                
+                // Crear sesión en Firebase con reintentos
+                const exito = await crearSesionConReintentos(codigo, 3);
+                
+                if (exito) {
+                    // Mostrar código
+                    document.getElementById('session-code-display').textContent = codigo;
+                    
+                    // Iniciar listeners
+                    escucharAlumnos(codigo);
+                    escucharBuzzers(codigo);
+                    escucharEstadoRonda(codigo);
+                    
+                    mostrarMensaje('✅ Sesión creada: ' + codigo, 'exito');
+                    console.log('✅ Sesión creada exitosamente');
+                } else {
+                    mostrarError('Error al crear sesión. Por favor recarga la página.');
+                    showHome();
+                }
+            } catch (error) {
+                console.error('❌ Error en crearSesionAutomatica:', error);
+                mostrarError('Error inesperado: ' + error.message);
+                showHome();
+            }
+        }
+        
+        function generarCodigoUnico() {
+            return Math.floor(100000 + Math.random() * 900000).toString();
+        }
+        
+        async function crearSesionConReintentos(codigo, intentosMaximos) {
+            for (let intento = 1; intento <= intentosMaximos; intento++) {
+                try {
+                    console.log(`Intento ${intento} de ${intentosMaximos}...`);
+                    
+                    await db.ref('sesiones/' + codigo).set({
+                        codigo: codigo,
+                        creada: Date.now(),
+                        rondaActiva: false,
+                        alumnos: {},
+                        buzzers: {}
+                    });
+                    
+                    // Verificar que se guardó correctamente
+                    const snap = await db.ref('sesiones/' + codigo).once('value');
+                    if (snap.exists()) {
+                        return true;
+                    }
+                } catch (error) {
+                    console.error(`❌ Error en intento ${intento}:`, error);
+                    if (intento === intentosMaximos) {
+                        return false;
+                    }
+                    // Esperar antes de reintentar (backoff exponencial)
+                    await esperar(1000 * intento);
+                }
+            }
+            return false;
+        }
+        
+        // PROFESOR: Escuchar alumnos
+        function escucharAlumnos(codigo) {
+            const listener = db.ref('sesiones/' + codigo + '/alumnos').on('value', (snap) => {
+                const alumnos = snap.val() || {};
+                const num = Object.keys(alumnos).length;
+                document.getElementById('student-count').textContent = num;
+                
+                const lista = document.getElementById('students-container');
+                lista.innerHTML = '';
+                Object.entries(alumnos).forEach(([id, alumno]) => {
+                    const div = document.createElement('div');
+                    div.className = 'student-item';
+                    div.innerHTML = `
+                        <div>
+                            <span class="student-name">👨‍🎓 ${alumno.nombre}</span>
+                        </div>
+                        <div class="score-controls">
+                            <span class="student-score">${alumno.puntos || 0} pts</span>
+                            <button class="btn btn--success score-btn" onclick="darPuntos('${id}', 1)">+1</button>
+                            <button class="btn btn--danger score-btn" onclick="darPuntos('${id}', -1)">-1</button>
+                        </div>
+                    `;
+                    lista.appendChild(div);
+                });
+                
+                if (num === 0) {
+                    lista.innerHTML = '<p style="color: var(--color-text-secondary); text-align: center;">No hay alumnos conectados</p>';
+                }
+            });
+            listeners.push({ off: () => db.ref('sesiones/' + codigo + '/alumnos').off('value', listener) });
+        }
+
+        // PROFESOR: Escuchar buzzers
+        function escucharBuzzers(codigo) {
+            const listener = db.ref('sesiones/' + codigo + '/buzzers').on('value', (snap) => {
+                const buzzers = snap.val() || {};
+                const lista = document.getElementById('buzzer-queue-container');
+                lista.innerHTML = '';
+                
+                const buzzerArray = Object.entries(buzzers).sort((a, b) => a[1].timestamp - b[1].timestamp);
+                
+                if (buzzerArray.length === 0) {
+                    lista.innerHTML = '<p style="color: var(--color-text-secondary); text-align: center;">Ningún alumno ha presionado el buzzer aún</p>';
+                } else {
+                    buzzerArray.forEach(([id, buzzer], index) => {
+                        const div = document.createElement('div');
+                        div.className = 'buzzer-item';
+                        div.innerHTML = `
+                            <div style="display: flex; align-items: center; gap: var(--space-12);">
+                                <div class="buzzer-position">${index + 1}</div>
+                                <span>${buzzer.nombre}</span>
+                            </div>
+                        `;
+                        lista.appendChild(div);
+                    });
+                }
+            });
+            listeners.push({ off: () => db.ref('sesiones/' + codigo + '/buzzers').off('value', listener) });
+        }
+
+        // PROFESOR: Escuchar estado de ronda
+        function escucharEstadoRonda(codigo) {
+            const listener = db.ref('sesiones/' + codigo + '/rondaActiva').on('value', (snap) => {
+                const activa = snap.val();
+                rondaActiva = activa;
+                const roundBtn = document.getElementById('round-btn');
+                if (activa) {
+                    roundBtn.textContent = 'FINALIZAR RONDA';
+                    roundBtn.className = 'btn btn--danger btn--lg btn--full';
+                } else {
+                    roundBtn.textContent = 'INICIAR RONDA';
+                    roundBtn.className = 'btn btn--success btn--lg btn--full';
+                }
+            });
+            listeners.push({ off: () => db.ref('sesiones/' + codigo + '/rondaActiva').off('value', listener) });
+        }
+        
+
+        
+
+        
+
+        
+        // PROFESOR: Iniciar ronda
+        function toggleRound() {
+            if (!rondaActiva) {
+                db.ref('sesiones/' + miCodigo).update({
+                    rondaActiva: true,
+                    buzzers: {}
+                });
+            } else {
+                db.ref('sesiones/' + miCodigo).update({
+                    rondaActiva: false
+                });
+            }
+        }
+        
+        // PROFESOR: Limpiar ronda
+        function clearRound() {
+            db.ref('sesiones/' + miCodigo + '/buzzers').remove();
+        }
+        
+
+        
+        // PROFESOR: Dar puntos
+        function darPuntos(alumnoId, puntos) {
+            db.ref('sesiones/' + miCodigo + '/alumnos/' + alumnoId + '/puntos').transaction((puntosActuales) => {
+                return Math.max(0, (puntosActuales || 0) + puntos);
+            });
+        }
+        
+
+        
+
+        
+
+        
+        function endSession() {
+            if (confirm('¿Estás seguro de que quieres finalizar la sesión?')) {
+                showHome();
+            }
+        }
+        
+        // ALUMNO: Unirse con estrategia robusta
+        async function joinSession() {
+            const codigoInput = document.getElementById('session-code-input').value.trim();
+            const nombreInput = document.getElementById('student-name-input').value.trim();
+            
+            // Validaciones básicas
+            if (!codigoInput) {
+                mostrarError('Por favor introduce el código de sesión');
+                return;
+            }
+            
+            if (!nombreInput || nombreInput.length < 2) {
+                mostrarError('Por favor introduce un nombre válido (mínimo 2 caracteres)');
+                return;
+            }
+            
+            if (codigoInput.length !== 6) {
+                mostrarError('El código debe tener 6 dígitos');
+                return;
+            }
+            
+            // Deshabilitar botón mientras conecta
+            const btnConectar = document.querySelector('#join-session-screen button');
+            const textoOriginal = btnConectar.textContent;
+            btnConectar.disabled = true;
+            btnConectar.textContent = 'Conectando...';
+            
+            try {
+                // Paso 1: Verificar conexión a Firebase
+                mostrarMensaje('Verificando conexión...', 'info');
+                const conectado = await verificarConexionFirebase();
+                if (!conectado) {
+                    throw new Error('No hay conexión a Firebase');
+                }
+                
+                // Paso 2: Verificar que la sesión existe
+                mostrarMensaje('Buscando sesión...', 'info');
+                const sesionExiste = await verificarSesionConReintentos(codigoInput, 3);
+                if (!sesionExiste) {
+                    throw new Error('Sesión no encontrada. Verifica el código.');
+                }
+                
+                // Paso 3: Unirse a la sesión
+                mostrarMensaje('Conectando...', 'info');
+                const exito = await unirseConReintentos(codigoInput, nombreInput, 3);
+                if (!exito) {
+                    throw new Error('Error al conectar. Intenta de nuevo.');
+                }
+                
+                // Paso 4: Éxito
+                miCodigo = codigoInput;
+                miNombre = nombreInput;
+                
+                document.getElementById('student-name-display').textContent = nombreInput;
+                document.getElementById('student-session-display').textContent = codigoInput;
+                
+                mostrarPantalla('student-screen');
+                
+                // Iniciar listeners
+                escucharRondaAlumno(codigoInput);
+                escucharPuntos(codigoInput, miId);
+                
+                // Mantener conexión activa
+                mantenerConexionActiva(codigoInput, miId);
+                
+                mostrarMensaje('✅ Conectado exitosamente', 'exito');
+                console.log('✅ Alumno conectado:', nombreInput);
+                
+            } catch (error) {
+                console.error('❌ Error al unirse:', error);
+                mostrarError(error.message);
+                btnConectar.disabled = false;
+                btnConectar.textContent = textoOriginal;
+            }
+        }
+        
+
+        
+        // ALUMNO: Escuchar estado de ronda (versión robusta)
+        function escucharRondaAlumno(codigo) {
+            const ref = db.ref('sesiones/' + codigo + '/rondaActiva');
+            
+            const listener = ref.on('value', (snap) => {
+                try {
+                    rondaActiva = snap.val() || false;
+                    const boton = document.getElementById('buzzer-button');
+                    const estado = document.getElementById('buzzer-status');
+                    
+                    if (!boton || !estado) return;
+                    
+                    if (rondaActiva) {
+                        boton.disabled = false;
+                        boton.className = 'buzzer-btn buzzer-btn--active';
+                        estado.innerHTML = '<span class="emoji">🔥</span> ¡PRESIONA EL BUZZER!';
+                        estado.className = 'buzzer-status buzzer-status--active';
+                        document.getElementById('session-waiting-message').style.display = 'none';
+                        console.log('🔔 Ronda activa');
+                    } else {
+                        boton.disabled = true;
+                        boton.className = 'buzzer-btn buzzer-btn--inactive';
+                        estado.innerHTML = '<span class="emoji">✅</span> Esperando pregunta...';
+                        estado.className = 'buzzer-status buzzer-status--waiting';
+                        document.getElementById('session-waiting-message').innerHTML = '<span class="emoji">⏳</span> Esperando pregunta...';
+                        document.getElementById('session-waiting-message').style.display = 'block';
+                        document.getElementById('student-position').style.display = 'none';
+                        console.log('⏸️ Ronda inactiva');
+                    }
+                } catch (error) {
+                    console.error('❌ Error en escucharRondaAlumno:', error);
+                }
+            }, (error) => {
+                console.error('❌ Error en listener de ronda:', error);
+                mostrarError('Error de conexión. Recarga la página.');
+            });
+            
+            listeners.push({ off: () => ref.off('value', listener) });
+        }
+
+        // ALUMNO: Escuchar puntos (versión robusta)
+        function escucharPuntos(codigo, alumnoId) {
+            const ref = db.ref('sesiones/' + codigo + '/alumnos/' + alumnoId + '/puntos');
+            
+            const listener = ref.on('value', (snap) => {
+                try {
+                    const puntos = snap.val() || 0;
+                    const elem = document.getElementById('student-score-display');
+                    if (elem) {
+                        elem.textContent = puntos;
+                        console.log('⭐ Puntos actualizados:', puntos);
+                    }
+                } catch (error) {
+                    console.error('❌ Error en escucharPuntos:', error);
+                }
+            }, (error) => {
+                console.error('❌ Error en listener de puntos:', error);
+            });
+            
+            listeners.push({ off: () => ref.off('value', listener) });
+        }
+        
+
+        
+
+        
+
+        
+
+        
+        // ALUMNO: Presionar buzzer
+        function pressBuzzer() {
+            if (!rondaActiva) return;
+            
+            const buzzerId = 'buzzer_' + Date.now();
+            db.ref('sesiones/' + miCodigo + '/buzzers/' + buzzerId).set({
+                nombre: miNombre,
+                alumnoId: miId,
+                timestamp: Date.now()
+            }).then(() => {
+                document.getElementById('buzzer-button').disabled = true;
+                document.getElementById('buzzer-button').className = 'buzzer-btn buzzer-btn--pressed';
+                document.getElementById('buzzer-status').innerHTML = '<span class="emoji">✅</span> ¡BUZZER PRESIONADO!';
+                document.getElementById('buzzer-status').className = 'buzzer-status buzzer-status--buzzed';
+                document.getElementById('session-waiting-message').innerHTML = '<span class="emoji">✅</span> ¡Buzzer presionado correctamente!';
+                document.getElementById('session-waiting-message').style.display = 'block';
+            }).catch(error => {
+                alert('Error al presionar buzzer: ' + error.message);
+            });
+        }
+        
+
+        
+        // Funciones auxiliares para robustez
+        async function verificarConexionFirebase() {
+            return new Promise((resolve) => {
+                const connectedRef = db.ref('.info/connected');
+                connectedRef.once('value', (snap) => {
+                    resolve(snap.val() === true);
+                });
+                // Timeout de 5 segundos
+                setTimeout(() => resolve(false), 5000);
+            });
+        }
+        
+        function esperar(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        async function verificarSesionConReintentos(codigo, intentosMaximos) {
+            for (let intento = 1; intento <= intentosMaximos; intento++) {
+                try {
+                    console.log(`Verificando sesión, intento ${intento}...`);
+                    const snap = await db.ref('sesiones/' + codigo).once('value');
+                    if (snap.exists()) {
+                        console.log('✅ Sesión encontrada');
+                        return true;
+                    }
+                    console.log('⚠️ Sesión no encontrada en intento', intento);
+                    if (intento < intentosMaximos) {
+                        await esperar(1000);
+                    }
+                } catch (error) {
+                    console.error(`❌ Error verificando sesión, intento ${intento}:`, error);
+                    if (intento < intentosMaximos) {
+                        await esperar(1000 * intento);
+                    }
+                }
+            }
+            return false;
+        }
+        
+        async function unirseConReintentos(codigo, nombre, intentosMaximos) {
+            for (let intento = 1; intento <= intentosMaximos; intento++) {
+                try {
+                    console.log(`Uniéndose a sesión, intento ${intento}...`);
+                    
+                    const alumnoId = 'alumno_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    
+                    await db.ref('sesiones/' + codigo + '/alumnos/' + alumnoId).set({
+                        nombre: nombre,
+                        puntos: 0,
+                        conectado: true,
+                        ultimaActividad: Date.now()
+                    });
+                    
+                    // Verificar que se guardó
+                    const snap = await db.ref('sesiones/' + codigo + '/alumnos/' + alumnoId).once('value');
+                    if (snap.exists()) {
+                        miId = alumnoId;
+                        return true;
+                    }
+                    
+                    console.log('⚠️ Fallo al guardar alumno, intento', intento);
+                    if (intento < intentosMaximos) {
+                        await esperar(1000 * intento);
+                    }
+                } catch (error) {
+                    console.error(`❌ Error uniéndose, intento ${intento}:`, error);
+                    if (intento < intentosMaximos) {
+                        await esperar(1000 * intento);
+                    }
+                }
+            }
+            return false;
+        }
+        
+        // Mantener conexión activa del alumno
+        function mantenerConexionActiva(codigo, alumnoId) {
+            // Actualizar ultimaActividad cada 30 segundos
+            setInterval(() => {
+                db.ref('sesiones/' + codigo + '/alumnos/' + alumnoId + '/ultimaActividad').set(Date.now());
+            }, 30000);
+            
+            // Marcar como desconectado al cerrar
+            window.addEventListener('beforeunload', () => {
+                db.ref('sesiones/' + codigo + '/alumnos/' + alumnoId + '/conectado').set(false);
+            });
+            
+            // Usar onDisconnect de Firebase
+            db.ref('sesiones/' + codigo + '/alumnos/' + alumnoId + '/conectado').onDisconnect().set(false);
+        }
+        
+        // Inicialización con verificación
+        window.addEventListener('DOMContentLoaded', async () => {
+            console.log('🚀 Iniciando aplicación...');
+            
+            // Verificar que Firebase está cargado
+            if (typeof firebase === 'undefined') {
+                mostrarError('Error: Firebase no está cargado. Recarga la página.');
+                return;
+            }
+            
+            try {
+                console.log('✅ Firebase inicializado');
+                
+                // Verificar conexión
+                const conectado = await verificarConexionFirebase();
+                if (conectado) {
+                    console.log('✅ Conectado a Firebase');
+                    mostrarMensaje('✅ Conectado', 'exito');
+                } else {
+                    console.warn('⚠️ No se pudo verificar conexión a Firebase');
+                    mostrarError('Advertencia: Problemas de conexión');
+                }
+            } catch (error) {
+                console.error('❌ Error al inicializar Firebase:', error);
+                mostrarError('Error de inicialización: ' + error.message);
+            }
+        });
+        
+        // Manejo de teclas para facilidad de uso
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                const buzzerButton = document.getElementById('buzzer-button');
+                if (buzzerButton && !buzzerButton.disabled) {
+                    pressBuzzer();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
