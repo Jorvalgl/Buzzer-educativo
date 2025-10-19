@@ -1070,6 +1070,26 @@
     <!-- PeerJS CDN -->
     <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
 </head>
+<!--
+Buzzer Educativo
+
+Desarrollado por: Jorge Valero Gómez-Lobo
+Correo: jorgevalero@usal.es
+Universidad de Salamanca, Salamanca (España)
+
+Actualizaciones y código: https://github.com/Jorvalgl
+
+Licencia: Creative Commons Attribution 4.0 International (CC BY 4.0)
+https://creativecommons.org/licenses/by/4.0/
+
+Puedes compartir, copiar, adaptar y redistribuir esta obra, incluso con fines comerciales,
+SIEMPRE que cites correctamente al autor y el enlace al repositorio.
+
+Ejemplo de cita:
+Buzzer Educativo desarrollado por Jorge Valero Gómez-Lobo, Universidad de Salamanca, 2025.
+Actualizaciones en: https://github.com/Jorvalgl
+-->
+
 <body>
     <div class="container">
         <!-- Pantalla Principal -->
@@ -1229,6 +1249,31 @@
                 </div>
             </div>
         </div>
+    </div>
+    
+    <!-- PIE DE PÁGINA CON ATRIBUCIÓN -->
+    <div style="margin-top: 40px; padding: 20px; text-align: center; font-size: 13px; color: #555; background: #f9f9f9; border-top: 2px solid #ddd;">
+        <span>
+            <strong style="font-size: 15px; color: #2C3E50;">Buzzer Educativo</strong><br>
+            <span style="margin-top: 8px; display: inline-block;">
+                Desarrollado por <strong>Jorge Valero Gómez-Lobo</strong> 
+                (<a href="mailto:jorgevalero@usal.es" style="color: #667eea; text-decoration: none;">jorgevalero@usal.es</a>)
+            </span><br>
+            <span style="color: #666;">Universidad de Salamanca, Salamanca (España)</span><br>
+            <a href="https://github.com/Jorvalgl" target="_blank" rel="noopener" style="color: #667eea; text-decoration: none; font-weight: 600;">
+                📦 Actualizaciones y código en GitHub
+            </a>
+            <br><br>
+            <img src="https://mirrors.creativecommons.org/presskit/buttons/88x31/png/by.png" alt="CC BY 4.0" style="vertical-align:middle; border: 1px solid #ddd;">
+            <br>
+            <span style="font-size: 12px; color: #666;">
+                Licencia: <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener" style="color: #667eea; text-decoration: none;">
+                    Creative Commons Attribution 4.0 International (CC BY 4.0)
+                </a>
+                <br>
+                Puedes compartir y adaptar citando al autor.
+            </span>
+        </span>
     </div>
     
     <script>
@@ -1911,21 +1956,22 @@
         
 
         
-        // Función para reproducir sonido de buzzer CORREGIDA para GitHub Pages
+        // Función para reproducir sonido de buzzer PROLONGADO (900ms) - MÁS GRAVE
         function reproducirSonidoBuzzer() {
             try {
-                // Usar el contexto global (ya inicializado)
-                const audioContext = audioContextGlobal || inicializarAudio();
+                // Usar contexto global
+                const audioContext = window.audioContextGlobal || inicializarAudio();
                 
-                // Verificar estado
                 if (audioContext.state === 'suspended') {
-                    console.log('⚠️ AudioContext suspendido, reanudando...');
                     audioContext.resume();
                 }
                 
-                console.log('🔊 Estado AudioContext:', audioContext.state);
+                console.log('🔊 Reproduciendo sonido GRAVE prolongado (900ms)');
                 
-                // Crear osciladores
+                // DURACIÓN: 900 milisegundos
+                const duracion = 0.9;
+                
+                // Crear 4 osciladores para sonido rico
                 const osc1 = audioContext.createOscillator();
                 const osc2 = audioContext.createOscillator();
                 const osc3 = audioContext.createOscillator();
@@ -1938,27 +1984,26 @@
                 osc4.connect(gainNode);
                 gainNode.connect(audioContext.destination);
                 
-                // Configurar sonido (igual que antes)
+                // FRECUENCIAS GRAVES (MÁS BAJAS)
                 osc1.type = 'square';
-                osc1.frequency.setValueAtTime(250, audioContext.currentTime);
+                osc1.frequency.setValueAtTime(120, audioContext.currentTime); // Muy grave
                 
                 osc2.type = 'sawtooth';
-                osc2.frequency.setValueAtTime(350, audioContext.currentTime);
+                osc2.frequency.setValueAtTime(180, audioContext.currentTime); // Grave
                 
                 osc3.type = 'square';
-                osc3.frequency.setValueAtTime(500, audioContext.currentTime);
+                osc3.frequency.setValueAtTime(280, audioContext.currentTime); // Medio-grave
                 
                 osc4.type = 'sawtooth';
-                osc4.frequency.setValueAtTime(700, audioContext.currentTime);
+                osc4.frequency.setValueAtTime(400, audioContext.currentTime); // Medio
                 
-                // Envelope
+                // Envelope: subida rápida, mantener alto, bajada suave
                 gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-                gainNode.gain.linearRampToValueAtTime(0.85, audioContext.currentTime + 0.02);
-                gainNode.gain.setValueAtTime(0.85, audioContext.currentTime + 0.45);
-                gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.5);
+                gainNode.gain.linearRampToValueAtTime(0.9, audioContext.currentTime + 0.08); // Subir
+                gainNode.gain.setValueAtTime(0.9, audioContext.currentTime + 0.8); // Mantener 800ms
+                gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + duracion); // Bajar
                 
-                const duracion = 0.5;
-                
+                // Reproducir por 900ms
                 osc1.start(audioContext.currentTime);
                 osc2.start(audioContext.currentTime);
                 osc3.start(audioContext.currentTime);
@@ -1969,27 +2014,31 @@
                 osc3.stop(audioContext.currentTime + duracion);
                 osc4.stop(audioContext.currentTime + duracion);
                 
-                console.log('🔊 Sonido reproducido correctamente');
+                console.log('🔊 Sonido GRAVE de 900ms reproducido');
             } catch (error) {
                 console.error('❌ Error al reproducir sonido:', error);
-                mostrarError('Error de audio: ' + error.message);
             }
         }
         
-        // Función para vibrar en dispositivos móviles MEJORADA
+        // Función para vibrar PROLONGADAMENTE (880ms total)
         function vibrarDispositivo() {
-            if ('vibrate' in navigator) {
-                // Vibración MÁS LARGA y MÁS INTENSA
-                // [vibrar 200ms, pausa 50ms, vibrar 200ms]
-                navigator.vibrate([200, 50, 200]);
-                console.log('📱 Vibración INTENSA activada');
+            try {
+                if ('vibrate' in navigator) {
+                    // Patrón de vibración: [vibrar, pausa, vibrar, pausa, vibrar]
+                    // Total: 250 + 80 + 250 + 80 + 220 = 880ms
+                    navigator.vibrate([250, 80, 250, 80, 220]);
+                    console.log('📱 Vibración prolongada activada (880ms total)');
+                } else {
+                    console.log('ℹ️ Vibración no soportada en este dispositivo');
+                }
+            } catch (error) {
+                console.error('❌ Error al vibrar:', error);
             }
         }
         
-        // ALUMNO: Presionar buzzer
+        // ALUMNO: Presionar buzzer con sonido y vibración PROLONGADOS
         function pressBuzzer() {
             console.log('🔔 Intentando presionar buzzer...');
-            console.log('🎵 AudioContext estado:', audioContextGlobal ? audioContextGlobal.state : 'no inicializado');
             
             if (!estado.rondaActiva || estado.buzzerPresionado) {
                 console.log('⚠️ Buzzer no disponible');
@@ -2000,7 +2049,7 @@
             
             const boton = document.getElementById('buzzer-button');
             
-            // ANIMACIÓN: Escalar y rotar
+            // Animación visual
             boton.style.transform = 'scale(0.9) rotate(5deg)';
             setTimeout(() => {
                 boton.style.transform = 'scale(1.1)';
@@ -2009,39 +2058,37 @@
                 }, 100);
             }, 100);
             
-            // REPRODUCIR SONIDO
+            // REPRODUCIR SONIDO PROLONGADO (900ms)
             reproducirSonidoBuzzer();
             
-            // VIBRAR
+            // VIBRAR PROLONGADAMENTE (880ms)
             vibrarDispositivo();
             
             // Enviar buzzer al profesor
-            try {
-                estado.conexionProfesor.send({
-                    tipo: 'buzzer',
-                    nombre: estado.miNombre,
-                    timestamp: Date.now()
-                });
-                
-                // Deshabilitar botón y actualizar UI
-                const statusEl = document.getElementById('buzzer-status');
-                const waitingMsg = document.getElementById('session-waiting-message');
-                
-                boton.disabled = true;
-                boton.className = 'buzzer-btn buzzer-btn--pressed';
-                statusEl.innerHTML = '<span class="emoji">✅</span> ¡BUZZER PRESIONADO!';
-                statusEl.className = 'buzzer-status buzzer-status--buzzed';
-                waitingMsg.innerHTML = '<span class="emoji">✅</span> ¡Buzzer presionado correctamente!';
-                waitingMsg.style.display = 'block';
-                
-                console.log('🔔 Buzzer presionado con sonido y vibración');
-                console.log('🔊 Sonido:', window.AudioContext || window.webkitAudioContext ? 'Disponible' : 'No disponible');
-                console.log('📱 Vibración:', 'vibrate' in navigator ? 'Soportada' : 'No soportada');
-                
-            } catch (error) {
-                console.error('Error al presionar buzzer:', error);
-                mostrarError('Error al presionar buzzer');
-            }
+            estado.conexionProfesor.send({
+                tipo: 'buzzer',
+                nombre: estado.miNombre,
+                timestamp: Date.now()
+            });
+            
+            // Deshabilitar botón
+            boton.disabled = true;
+            boton.classList.remove('activo');
+            
+            // Cambiar color a verde
+            boton.style.background = 'linear-gradient(135deg, #4CAF50 0%, #45B649 100%)';
+            
+            // Actualizar UI
+            const statusEl = document.getElementById('buzzer-status');
+            const waitingMsg = document.getElementById('session-waiting-message');
+            
+            boton.className = 'buzzer-btn buzzer-btn--pressed';
+            statusEl.innerHTML = '<span class="emoji">✅</span> ¡BUZZER PRESIONADO!';
+            statusEl.className = 'buzzer-status buzzer-status--buzzed';
+            waitingMsg.innerHTML = '<span class="emoji">✅</span> Buzzer enviado ✅';
+            waitingMsg.style.display = 'block';
+            
+            console.log('🔔 Buzzer presionado con sonido GRAVE (900ms) y vibración (880ms)');
         }
         
 
