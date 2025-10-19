@@ -376,6 +376,7 @@
         .students-list h3 {
             font-size: var(--font-size-xl);
             margin-bottom: var(--space-16);
+            color: #764ba2; /* Color morado para títulos */
         }
         
         .student-item {
@@ -391,6 +392,16 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
+        /* Asegurar que todo el texto en student-item sea oscuro */
+        .student-item * {
+            color: #2C3E50 !important;
+        }
+        
+        /* Excepto los botones que deben mantener su color blanco */
+        .student-item button {
+            color: white !important;
+        }
+        
         .student-item:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(252, 182, 159, 0.4);
@@ -400,6 +411,7 @@
             font-family: 'Poppins', sans-serif;
             font-weight: 600;
             font-size: 16px;
+            color: #2C3E50 !important; /* Texto negro para visibilidad */
         }
         
         .student-score {
@@ -771,6 +783,7 @@
         .buzzer-queue h3 {
             font-size: var(--font-size-xl);
             margin-bottom: var(--space-16);
+            color: #764ba2; /* Color morado para títulos */
         }
         
         .buzzer-item {
@@ -785,6 +798,7 @@
             border: 1px solid rgba(168, 237, 234, 0.5);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             animation: slideInRight 0.5s ease-out;
+            color: #FF6B35 !important; /* Color naranja oscuro para buzzer items */
         }
         
         .buzzer-item:hover {
@@ -938,7 +952,7 @@
                     <input type="text" id="student-name-input" class="form-control" placeholder="Ej: Ana López">
                 </div>
                 
-                <button class="btn btn--primary btn--lg btn--full" onclick="joinSession()">
+                <button class="btn btn--primary btn--lg btn--full" onclick="unirse()">
                     🎆 CONECTAR
                 </button>
             </div>
@@ -961,8 +975,25 @@
             
             <div class="card">
                 <div class="students-list">
-                    <h3><span class="emoji">👥</span> Alumnos Conectados (<span id="student-count" style="color: var(--color-primary-vibrant); font-weight: 800;">0</span>)</h3>
+                    <h3><span class="emoji">👥</span> Alumnos Conectados (<span id="student-count" style="color: #4CAF50; font-weight: 800;">0</span>)</h3>
                     <div id="students-container"></div>
+                </div>
+            </div>
+            
+            <!-- Información sobre sesiones simultáneas -->
+            <div class="card" style="background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%); border: 2px solid #2196F3;">
+                <h3 style="color: #1976D2; margin-bottom: 16px;">ℹ️ Sesiones Simultáneas</h3>
+                <p style="margin-bottom: 12px; color: #333;">
+                    <strong>¿Varios profesores pueden usar esto a la vez?</strong><br>
+                    ¡SÍ! Cada profesor genera su propio código único de 6 dígitos. Las sesiones son completamente 
+                    independientes y pueden funcionar simultáneamente sin límite.
+                </p>
+                <div style="background: rgba(255,255,255,0.8); padding: 12px; border-radius: 8px; margin-top: 12px;">
+                    <strong>Ejemplo:</strong><br>
+                    📚 Profesor A (Biología): Código 742851<br>
+                    📖 Profesor B (Historia): Código 389204<br>
+                    🔢 Profesor C (Matemáticas): Código 561923<br>
+                    <em style="color: #666;">Todas funcionando al mismo tiempo sin interferencias</em>
                 </div>
             </div>
             
@@ -1030,7 +1061,9 @@
     </div>
     
     <script>
-        // Variables globales para PeerJS
+        // Variables globales para PeerJS y Audio
+        let audioContextGlobal = null;
+        
         const estado = {
             // Profesor
             peerProfesor: null,
@@ -1148,9 +1181,28 @@
             }
         }
         
+        // Función para inicializar AudioContext
+        function inicializarAudio() {
+            if (!audioContextGlobal) {
+                audioContextGlobal = new (window.AudioContext || window.webkitAudioContext)();
+                console.log('🎵 AudioContext creado');
+            }
+            
+            // Reanudar si está suspendido
+            if (audioContextGlobal.state === 'suspended') {
+                audioContextGlobal.resume().then(() => {
+                    console.log('🎵 AudioContext reanudado');
+                });
+            }
+            
+            return audioContextGlobal;
+        }
+        
 
         
         async function irProfesor() {
+            inicializarAudio(); // Preparar audio
+            
             // Ocultar pantalla inicio
             mostrarPantalla('teacher-screen');
             
@@ -1162,6 +1214,8 @@
         }
 
         function irAlumno() {
+            inicializarAudio(); // Preparar audio
+            
             mostrarPantalla('join-session-screen');
             // Configurar input cuando se muestra la pantalla
             setTimeout(setupCodeInput, 100);
@@ -1436,6 +1490,11 @@
             }
         }
         
+        function unirse() {
+            inicializarAudio(); // Preparar audio
+            joinSession(); // Proceder con la conexión
+        }
+        
         // ALUMNO: Unirse a sesión usando PeerJS
         async function joinSession() {
             const codigoInput = document.getElementById('session-code-input').value.trim();
@@ -1613,16 +1672,21 @@
         
 
         
-        // Función para reproducir sonido de buzzer MEJORADO
+        // Función para reproducir sonido de buzzer CORREGIDA para GitHub Pages
         function reproducirSonidoBuzzer() {
             try {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                // Usar el contexto global (ya inicializado)
+                const audioContext = audioContextGlobal || inicializarAudio();
                 
+                // Verificar estado
                 if (audioContext.state === 'suspended') {
+                    console.log('⚠️ AudioContext suspendido, reanudando...');
                     audioContext.resume();
                 }
                 
-                // Múltiples osciladores para sonido MÁS RICO y FUERTE
+                console.log('🔊 Estado AudioContext:', audioContext.state);
+                
+                // Crear osciladores
                 const osc1 = audioContext.createOscillator();
                 const osc2 = audioContext.createOscillator();
                 const osc3 = audioContext.createOscillator();
@@ -1635,7 +1699,7 @@
                 osc4.connect(gainNode);
                 gainNode.connect(audioContext.destination);
                 
-                // Stack de frecuencias para sonido más LLENO y POTENTE
+                // Configurar sonido (igual que antes)
                 osc1.type = 'square';
                 osc1.frequency.setValueAtTime(250, audioContext.currentTime);
                 
@@ -1648,13 +1712,13 @@
                 osc4.type = 'sawtooth';
                 osc4.frequency.setValueAtTime(700, audioContext.currentTime);
                 
-                // VOLUMEN ALTO y SOSTENIDO (85% del máximo)
+                // Envelope
                 gainNode.gain.setValueAtTime(0, audioContext.currentTime);
                 gainNode.gain.linearRampToValueAtTime(0.85, audioContext.currentTime + 0.02);
                 gainNode.gain.setValueAtTime(0.85, audioContext.currentTime + 0.45);
                 gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.5);
                 
-                const duracion = 0.5; // MÁS LARGO (500ms)
+                const duracion = 0.5;
                 
                 osc1.start(audioContext.currentTime);
                 osc2.start(audioContext.currentTime);
@@ -1666,9 +1730,10 @@
                 osc3.stop(audioContext.currentTime + duracion);
                 osc4.stop(audioContext.currentTime + duracion);
                 
-                console.log('🔊📢 Sonido GAME SHOW reproducido - MUY FUERTE');
+                console.log('🔊 Sonido reproducido correctamente');
             } catch (error) {
                 console.error('❌ Error al reproducir sonido:', error);
+                mostrarError('Error de audio: ' + error.message);
             }
         }
         
@@ -1684,7 +1749,11 @@
         
         // ALUMNO: Presionar buzzer
         function pressBuzzer() {
+            console.log('🔔 Intentando presionar buzzer...');
+            console.log('🎵 AudioContext estado:', audioContextGlobal ? audioContextGlobal.state : 'no inicializado');
+            
             if (!estado.rondaActiva || estado.buzzerPresionado) {
+                console.log('⚠️ Buzzer no disponible');
                 return;
             }
             
@@ -1774,19 +1843,23 @@
         
         // Inicialización con PeerJS
         window.addEventListener('DOMContentLoaded', () => {
-            console.log('🚀 Iniciando aplicación...');
+            console.log('🚀 Aplicación cargada');
             
             // Configurar input de código
             setupCodeInput();
             
-            // Verificar que PeerJS está cargado
+            // Verificar que PeerJS está disponible
             if (typeof Peer === 'undefined') {
-                mostrarError('Error: PeerJS no está cargado. Recarga la página.');
-                console.error('❌ PeerJS no disponible');
+                console.error('❌ PeerJS no cargado');
+                mostrarError('Error: PeerJS no disponible. Recarga la página.');
             } else {
-                console.log('✅ PeerJS cargado correctamente');
-                mostrarMensaje('✅ Sistema listo', 'exito');
+                console.log('✅ PeerJS cargado');
             }
+            
+            // NO crear AudioContext aquí (esperamos interacción del usuario)
+            console.log('ℹ️ Audio se inicializará con la primera interacción');
+            
+            mostrarMensaje('✅ Sistema listo', 'exito');
         });
         
         // Manejo de teclas para facilidad de uso
