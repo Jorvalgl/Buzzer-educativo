@@ -172,13 +172,13 @@
             font-size: var(--font-size-4xl);
             font-weight: 800;
             margin-bottom: var(--space-8);
-            color: var(--color-primary-vibrant);
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            color: #2C3E50 !important; /* Negro para máxima visibilidad */
+            text-shadow: none;
         }
         
         .header p {
             font-size: var(--font-size-lg);
-            color: var(--color-text-secondary);
+            color: #2C3E50 !important; /* Negro para máxima visibilidad */
             font-weight: 500;
         }
         
@@ -272,6 +272,80 @@
             min-height: 64px;
         }
         
+        /* Enhanced button visibility for "SOY ALUMNO" */
+        .btn-grande {
+            width: 100%;
+            padding: 25px 20px;
+            margin: 15px 0;
+            font-size: 26px;
+            font-weight: 900; /* Extra bold */
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #FFFFFF !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); /* Shadow for better readability */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+            letter-spacing: 1px; /* Spacing for better readability */
+            text-transform: uppercase;
+        }
+        
+        .btn-grande:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+        
+        /* Export button styling */
+        .btn-exportar {
+            width: 100%;
+            padding: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            background: #2196F3; /* Blue */
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 20px 0;
+        }
+        
+        .btn-exportar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(33, 150, 243, 0.4);
+            background: #1976D2;
+        }
+        
+        .btn-exportar:active {
+            transform: translateY(0);
+        }
+        
+        .btn-exportar-alt {
+            width: 100%;
+            padding: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            background: #9C27B0; /* Morado */
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(156, 39, 176, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn-exportar-alt:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(156, 39, 176, 0.4);
+            background: #7B1FA2;
+        }
+        
+        .btn-exportar-alt:active {
+            transform: translateY(0);
+        }
+        
         .btn--xl {
             padding: var(--space-32);
             font-size: var(--font-size-3xl);
@@ -299,6 +373,7 @@
             margin-bottom: var(--space-8);
             font-weight: var(--font-weight-medium);
             font-size: var(--font-size-base);
+            color: #2C3E50 !important; /* Negro para máxima visibilidad */
         }
         
         .form-control {
@@ -307,9 +382,29 @@
             border: 1px solid var(--color-border);
             border-radius: var(--radius-base);
             font-size: var(--font-size-base);
-            background: var(--color-surface);
-            color: var(--color-text);
+            background: #FFFFFF; /* Fondo blanco */
+            color: #2C3E50 !important; /* Texto negro */
             min-height: 48px;
+        }
+
+        /* Placeholders - GRIS MEDIO VISIBLE */
+        .form-control::placeholder {
+            color: #6c757d !important;
+            opacity: 1;
+        }
+        
+        .form-control::-moz-placeholder {
+            color: #6c757d !important;
+            opacity: 1;
+        }
+        
+        .form-control::-webkit-input-placeholder {
+            color: #6c757d !important;
+            opacity: 1;
+        }
+        
+        .form-control::-ms-input-placeholder {
+            color: #6c757d !important;
         }
         
         .form-control:focus {
@@ -346,7 +441,7 @@
             font-size: var(--font-size-2xl);
             font-weight: 600;
             margin-bottom: var(--space-16);
-            color: #333;
+            color: #2C3E50 !important; /* Negro para máxima visibilidad */
             position: relative;
             z-index: 1;
         }
@@ -376,7 +471,7 @@
         .students-list h3 {
             font-size: var(--font-size-xl);
             margin-bottom: var(--space-16);
-            color: #764ba2; /* Color morado para títulos */
+            color: #2C3E50 !important; /* Negro para máxima visibilidad */
         }
         
         .student-item {
@@ -392,7 +487,7 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
-        /* Asegurar que todo el texto en student-item sea oscuro */
+        /* Asegurar que todo el texto en student-item sea oscuro y visible */
         .student-item * {
             color: #2C3E50 !important;
         }
@@ -400,6 +495,12 @@
         /* Excepto los botones que deben mantener su color blanco */
         .student-item button {
             color: white !important;
+        }
+        
+        /* Asegurar que todo el texto en buzzer-item sea oscuro y visible */
+        .buzzer-item * {
+            color: #FF6B35 !important;
+            font-weight: 600;
         }
         
         .student-item:hover {
@@ -632,6 +733,65 @@
             margin-top: 8px;
         }
         
+        /* TEXTOS ADICIONALES - CORREGIR VISIBILIDAD */
+        h2, h3, h4, h5, h6 {
+            color: #2C3E50 !important;
+        }
+        
+        p {
+            color: #2C3E50 !important;
+        }
+        
+        /* Contador de alumnos */
+        #student-count {
+            color: #4CAF50 !important;
+            font-weight: 800;
+        }
+        
+        /* Estado de ronda */
+        #buzzer-status {
+            color: #2C3E50 !important;
+        }
+        
+        .buzzer-status--waiting {
+            color: #6c757d !important;
+        }
+        
+        .buzzer-status--active {
+            color: white !important;
+        }
+        
+        .buzzer-status--buzzed {
+            color: white !important;
+        }
+        
+        .buzzer-status--finished {
+            color: #2e7d32 !important;
+        }
+        
+        /* Puntuación del estudiante */
+        .score-number {
+            color: #FF6B35 !important;
+        }
+        
+        .score-label {
+            color: #2C3E50 !important;
+        }
+        
+        /* Posición del estudiante */
+        .position-number {
+            color: #FF6B35 !important;
+        }
+        
+        .position-text {
+            color: #2C3E50 !important;
+        }
+        
+        /* Mensajes de estado */
+        #session-waiting-message {
+            color: #6c757d !important;
+        }
+        
         /* MEGA BUZZER BUTTON STYLES */
         .buzzer-container {
             display: flex;
@@ -783,7 +943,7 @@
         .buzzer-queue h3 {
             font-size: var(--font-size-xl);
             margin-bottom: var(--space-16);
-            color: #764ba2; /* Color morado para títulos */
+            color: #2C3E50 !important; /* Negro para máxima visibilidad */
         }
         
         .buzzer-item {
@@ -791,14 +951,15 @@
             justify-content: space-between;
             align-items: center;
             padding: 16px 20px;
-            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            background: #FFF3E0; /* Fondo crema claro */
             border-radius: 12px;
             margin-bottom: var(--space-8);
-            box-shadow: 0 2px 10px rgba(168, 237, 234, 0.3);
-            border: 1px solid rgba(168, 237, 234, 0.5);
+            box-shadow: 0 2px 10px rgba(255, 107, 53, 0.3);
+            border: 2px solid #FF6B35;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             animation: slideInRight 0.5s ease-out;
             color: #FF6B35 !important; /* Color naranja oscuro para buzzer items */
+            font-weight: 600;
         }
         
         .buzzer-item:hover {
@@ -919,11 +1080,13 @@
             </div>
             
             <div class="card">
-                <button class="btn btn--primary btn--lg btn--full" onclick="irProfesor()">
-                    📚 SOY PROFESOR
+                <button class="btn-grande" onclick="irProfesor()">
+                    <span style="font-size: 32px;">👨‍🏫</span><br>
+                    <span style="font-weight: 900; font-size: 26px;">SOY PROFESOR</span>
                 </button>
-                <button class="btn btn--secondary btn--lg btn--full" onclick="irAlumno()">
-                    🎓 SOY ALUMNO
+                <button class="btn-grande" onclick="irAlumno()">
+                    <span style="font-size: 32px;">👨‍🎓</span><br>
+                    <span style="font-weight: 900; font-size: 26px;">SOY ALUMNO</span>
                 </button>
             </div>
         </div>
@@ -942,14 +1105,29 @@
             <div class="card">
                 <div id="join-error" class="error-message" style="display: none;"></div>
                 
-                <div class="form-group">
-                    <label class="form-label" for="session-code-input">Código de Sesión (6 dígitos)</label>
-                    <input type="text" id="session-code-input" class="form-control" placeholder="Ej: 742851" maxlength="6" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                <!-- Instrucciones visibles -->
+                <div style="background: #E3F2FD; padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #2196F3;">
+                    <p style="color: #1565C0 !important; font-size: 16px; margin: 5px 0; font-weight: 600;">
+                        <strong>📋 Instrucciones:</strong><br>
+                        1. Introduce el código de 6 dígitos que te dará tu profesor<br>
+                        2. Escribe tu nombre y apellidos en los campos correspondientes<br>
+                        3. Presiona CONECTAR
+                    </p>
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label" for="student-name-input">Tu Nombre</label>
-                    <input type="text" id="student-name-input" class="form-control" placeholder="Ej: Ana López">
+                    <label class="form-label" for="input-codigo">Código de Sesión (6 dígitos)</label>
+                    <input type="text" id="input-codigo" class="form-control" placeholder="Ejemplo: 742851" maxlength="6" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="input-nombre">Nombre:</label>
+                    <input type="text" id="input-nombre" class="form-control" placeholder="Ejemplo: María" maxlength="30" autocomplete="given-name">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="input-apellidos">Apellidos:</label>
+                    <input type="text" id="input-apellidos" class="form-control" placeholder="Ejemplo: García López" maxlength="40" autocomplete="family-name">
                 </div>
                 
                 <button class="btn btn--primary btn--lg btn--full" onclick="unirse()">
@@ -968,34 +1146,27 @@
                 <button onclick="copiarCodigo()" style="margin-top: 15px; padding: 10px 20px; background: #2196F3; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; position: relative; z-index: 1;">
                     📋 Copiar Código
                 </button>
-                <p style="color: #666; margin-top: 10px; position: relative; z-index: 1;">
-                    Comparte este código con tus alumnos
-                </p>
             </div>
             
             <div class="card">
                 <div class="students-list">
                     <h3><span class="emoji">👥</span> Alumnos Conectados (<span id="student-count" style="color: #4CAF50; font-weight: 800;">0</span>)</h3>
-                    <div id="students-container"></div>
+                    <div id="students-container">
+                        <p style="color: #6c757d; text-align: center; font-style: italic;">No hay alumnos conectados</p>
+                    </div>
                 </div>
+                
+                <!-- Export buttons -->
+                <button onclick="exportarPuntuaciones()" class="btn-exportar" style="margin: 10px 0;">
+                    📊 DESCARGAR CSV (EXCEL)
+                </button>
+                
+                <button onclick="exportarPuntuacionesHTML()" class="btn-exportar-alt" style="margin: 10px 0;">
+                    📄 DESCARGAR TABLA (HTML)
+                </button>
             </div>
             
-            <!-- Información sobre sesiones simultáneas -->
-            <div class="card" style="background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%); border: 2px solid #2196F3;">
-                <h3 style="color: #1976D2; margin-bottom: 16px;">ℹ️ Sesiones Simultáneas</h3>
-                <p style="margin-bottom: 12px; color: #333;">
-                    <strong>¿Varios profesores pueden usar esto a la vez?</strong><br>
-                    ¡SÍ! Cada profesor genera su propio código único de 6 dígitos. Las sesiones son completamente 
-                    independientes y pueden funcionar simultáneamente sin límite.
-                </p>
-                <div style="background: rgba(255,255,255,0.8); padding: 12px; border-radius: 8px; margin-top: 12px;">
-                    <strong>Ejemplo:</strong><br>
-                    📚 Profesor A (Biología): Código 742851<br>
-                    📖 Profesor B (Historia): Código 389204<br>
-                    🔢 Profesor C (Matemáticas): Código 561923<br>
-                    <em style="color: #666;">Todas funcionando al mismo tiempo sin interferencias</em>
-                </div>
-            </div>
+
             
             <div class="card">
                 <div class="round-controls">
@@ -1012,7 +1183,7 @@
                 <div class="buzzer-queue">
                     <h3><span class="emoji">🏁</span> Orden de Respuestas</h3>
                     <div id="buzzer-queue-container">
-                        <p style="color: var(--color-text-secondary); text-align: center; font-style: italic;">Ningún alumno ha presionado el buzzer aún</p>
+                        <p style="color: #6c757d !important; text-align: center; font-style: italic;">Ningún alumno ha presionado el buzzer aún</p>
                     </div>
                 </div>
             </div>
@@ -1217,8 +1388,8 @@
             inicializarAudio(); // Preparar audio
             
             mostrarPantalla('join-session-screen');
-            // Configurar input cuando se muestra la pantalla
-            setTimeout(setupCodeInput, 100);
+            // Configurar inputs cuando se muestra la pantalla
+            setTimeout(setupInputs, 100);
         }
 
         function showHome() {
@@ -1230,8 +1401,8 @@
 
         function showJoinSession() {
             mostrarPantalla('join-session-screen');
-            // Configurar input cuando se muestra la pantalla
-            setTimeout(setupCodeInput, 100);
+            // Configurar inputs cuando se muestra la pantalla
+            setTimeout(setupInputs, 100);
         }
         
         // Función para generar código corto de 6 dígitos
@@ -1323,7 +1494,7 @@
                     estado.conexiones.set(conn.peer, {
                         conn: conn,
                         nombre: data.nombre,
-                        puntos: 0
+                        puntos: 0  // Empezar en 0, puede bajar a negativos
                     });
                     actualizarListaAlumnos();
                     console.log('✅ Alumno conectado:', data.nombre);
@@ -1342,7 +1513,7 @@
             }
         }
         
-        // PROFESOR: Actualizar lista de alumnos
+        // PROFESOR: Actualizar lista de alumnos - MOSTRAR PUNTOS NEGATIVOS
         function actualizarListaAlumnos() {
             const num = estado.conexiones.size;
             document.getElementById('student-count').textContent = num;
@@ -1353,25 +1524,34 @@
             estado.conexiones.forEach((alumno, id) => {
                 const div = document.createElement('div');
                 div.className = 'student-item';
+                
+                // Estilo diferente si puntos negativos
+                const puntosColor = alumno.puntos < 0 ? 'color: #FF5252; font-weight: bold;' : 
+                                   alumno.puntos === 0 ? 'color: #666; font-weight: bold;' : 
+                                   'color: #4CAF50; font-weight: bold;';
+                const puntosTexto = alumno.puntos;
+                
                 div.innerHTML = `
                     <div>
                         <span class="student-name">👨‍🎓 ${alumno.nombre}</span>
                     </div>
                     <div class="score-controls">
-                        <span class="student-score">${alumno.puntos} pts</span>
+                        <span class="student-score" style="${puntosColor}">${puntosTexto} pts</span>
+                        <button class="btn btn--success score-btn" onclick="darPuntos('${id}', 5)" style="background: #2196F3;">+5</button>
                         <button class="btn btn--success score-btn" onclick="darPuntos('${id}', 1)">+1</button>
                         <button class="btn btn--danger score-btn" onclick="darPuntos('${id}', -1)">-1</button>
+                        <button class="btn btn--danger score-btn" onclick="darPuntos('${id}', -5)" style="background: #9C27B0;">-5</button>
                     </div>
                 `;
                 lista.appendChild(div);
             });
             
             if (num === 0) {
-                lista.innerHTML = '<p style="color: var(--color-text-secondary); text-align: center;">No hay alumnos conectados</p>';
+                lista.innerHTML = '<p style="color: #6c757d !important; text-align: center;">No hay alumnos conectados</p>';
             }
         }
 
-        // PROFESOR: Actualizar lista de buzzers
+        // PROFESOR: Actualizar lista de buzzers (SIN números de orden)
         function actualizarListaBuzzers() {
             const lista = document.getElementById('buzzer-queue-container');
             lista.innerHTML = '';
@@ -1379,17 +1559,34 @@
             const buzzerOrdenados = [...estado.buzzers].sort((a, b) => a.timestamp - b.timestamp);
             
             if (buzzerOrdenados.length === 0) {
-                lista.innerHTML = '<p style="color: var(--color-text-secondary); text-align: center;">Ningún alumno ha presionado el buzzer aún</p>';
+                lista.innerHTML = '<p style="color: #6c757d !important; text-align: center; padding: 20px;">Aún no hay respuestas</p>';
             } else {
                 buzzerOrdenados.forEach((buzzer, index) => {
                     const div = document.createElement('div');
                     div.className = 'buzzer-item';
-                    div.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: var(--space-12);">
-                            <div class="buzzer-position">${index + 1}</div>
-                            <span>${buzzer.nombre}</span>
-                        </div>
-                    `;
+                    
+                    // Create structure with medal/badge only for first 3
+                    let medalIcon = '';
+                    let badgeColor = '';
+                    
+                    if (index === 0) {
+                        medalIcon = '🥇'; // Gold medal
+                        badgeColor = '#FFD700';
+                    } else if (index === 1) {
+                        medalIcon = '🥈'; // Silver medal
+                        badgeColor = '#C0C0C0';
+                    } else if (index === 2) {
+                        medalIcon = '🥉'; // Bronze medal
+                        badgeColor = '#CD7F32';
+                    }
+                    
+                    if (medalIcon) {
+                        div.innerHTML = `<span style="font-size: 24px; margin-right: 10px;">${medalIcon}</span>${buzzer.nombre}`;
+                        div.style.borderLeft = `5px solid ${badgeColor}`;
+                    } else {
+                        div.textContent = buzzer.nombre;
+                    }
+                    
                     lista.appendChild(div);
                 });
             }
@@ -1458,11 +1655,14 @@
         
 
         
-        // PROFESOR: Dar puntos
+        // PROFESOR: Dar puntos - PERMITIR PUNTOS NEGATIVOS
         function darPuntos(alumnoId, puntos) {
             const alumno = estado.conexiones.get(alumnoId);
             if (alumno) {
-                alumno.puntos = Math.max(0, alumno.puntos + puntos);
+                // PERMITIR puntos negativos (eliminar Math.max)
+                alumno.puntos += puntos;
+                
+                console.log(`⭐ ${alumno.nombre}: ${alumno.puntos} puntos`);
                 
                 // Enviar actualización al alumno
                 try {
@@ -1492,29 +1692,48 @@
         
         function unirse() {
             inicializarAudio(); // Preparar audio
-            joinSession(); // Proceder con la conexión
-        }
-        
-        // ALUMNO: Unirse a sesión usando PeerJS
-        async function joinSession() {
-            const codigoInput = document.getElementById('session-code-input').value.trim();
-            const nombreInput = document.getElementById('student-name-input').value.trim();
             
-            // Validar que el código tenga exactamente 6 dígitos
-            if (!codigoInput) {
-                mostrarError('Por favor introduce el código de sesión');
-                return;
-            }
+            const codigoInput = document.getElementById('input-codigo').value.trim();
+            const nombreInput = document.getElementById('input-nombre').value.trim();
+            const apellidosInput = document.getElementById('input-apellidos').value.trim();
             
-            if (!/^\d{6}$/.test(codigoInput)) {
+            console.log('🔍 Código:', codigoInput);
+            console.log('🔍 Nombre:', nombreInput);
+            console.log('🔍 Apellidos:', apellidosInput);
+            
+            // Validar código
+            if (!codigoInput || !/^\d{6}$/.test(codigoInput)) {
                 mostrarError('El código debe ser de 6 dígitos numéricos');
                 return;
             }
             
+            // Validar nombre
             if (!nombreInput || nombreInput.length < 2) {
-                mostrarError('El nombre debe tener al menos 2 caracteres');
+                mostrarError('Por favor introduce tu nombre (mínimo 2 caracteres)');
                 return;
             }
+            
+            // Validar apellidos
+            if (!apellidosInput || apellidosInput.length < 2) {
+                mostrarError('Por favor introduce tus apellidos (mínimo 2 caracteres)');
+                return;
+            }
+            
+            // CONCATENAR nombre y apellidos con espacio automático
+            const nombreCompleto = nombreInput + ' ' + apellidosInput;
+            
+            console.log('✅ Nombre completo generado:', nombreCompleto);
+            console.log('✅ Contiene espacio:', nombreCompleto.includes(' '));
+            
+            // Proceder con la conexión usando el nombre completo
+            joinSessionWithName(codigoInput, nombreCompleto);
+        }
+        
+        // ALUMNO: Unirse a sesión con nombre completo generado automáticamente
+        async function joinSessionWithName(codigoInput, nombreCompleto) {
+            console.log('🔍 Código introducido:', codigoInput);
+            console.log('🔍 Nombre completo:', nombreCompleto);
+            console.log('🔍 Nombre contiene espacios:', nombreCompleto.includes(' '));
             
             // Deshabilitar botón mientras conecta
             const btnConectar = document.querySelector('#join-session-screen .btn--primary');
@@ -1549,22 +1768,24 @@
                         clearTimeout(timeout);
                         console.log('✅ Conectado al profesor');
                         
-                        // Enviar mensaje de conexión con nombre
+                        // Enviar mensaje de conexión con nombre completo
                         estado.conexionProfesor.send({
                             tipo: 'conectar',
-                            nombre: nombreInput,
+                            nombre: nombreCompleto,  // ← "María García" con espacio automático
                             alumnoId: id
                         });
                         
-                        estado.miNombre = nombreInput;
+                        estado.miNombre = nombreCompleto;
                         
                         // Mostrar interfaz de buzzer
-                        document.getElementById('student-name-display').textContent = nombreInput;
+                        document.getElementById('student-name-display').textContent = nombreCompleto;
                         document.getElementById('student-session-display').textContent = codigoInput;
                         
                         mostrarPantalla('student-screen');
                         
-                        mostrarMensaje('✅ Conectado exitosamente', 'exito');
+                        mostrarMensaje('✅ Conectado como: ' + nombreCompleto, 'exito');
+                        
+                        console.log('🎉 Nombre enviado al profesor:', nombreCompleto);
                         
                         btnConectar.disabled = false;
                         btnConectar.textContent = textoOriginal;
@@ -1604,6 +1825,13 @@
                 btnConectar.disabled = false;
                 btnConectar.textContent = textoOriginal;
             }
+        }
+        
+        // Función legacy para compatibilidad - ELIMINADA
+        async function joinSession() {
+            // Esta función legacy se mantiene por compatibilidad pero no se usa
+            console.log('⚠️ joinSession() legacy llamada - usando unirse() en su lugar');
+            return;
         }
         
 
@@ -1656,7 +1884,18 @@
                     
                 case 'actualizar_puntos':
                     estado.misPuntos = data.puntos;
-                    document.getElementById('student-score-display').textContent = data.puntos;
+                    const elemPuntos = document.getElementById('student-score-display');
+                    elemPuntos.textContent = data.puntos;
+                    
+                    // Color según positivo/negativo/cero
+                    if (data.puntos < 0) {
+                        elemPuntos.style.color = '#FF5252'; // Rojo para negativos
+                    } else if (data.puntos === 0) {
+                        elemPuntos.style.color = '#666'; // Gris para cero
+                    } else {
+                        elemPuntos.style.color = '#4CAF50'; // Verde para positivos
+                    }
+                    
                     console.log('⭐ Puntos actualizados:', data.puntos);
                     break;
             }
@@ -1809,20 +2048,42 @@
         
 
         
-        // Formato automático del input de código
-        function setupCodeInput() {
-            const codeInput = document.getElementById('session-code-input');
-            if (codeInput && !codeInput.dataset.configured) {
-                codeInput.addEventListener('input', (e) => {
-                    // Permitir solo números
+        // Configuración de inputs - SOLUCIÓN DEFINITIVA ESPACIOS
+        function setupInputs() {
+            console.log('🚀 Configurando inputs...');
+            
+            // INPUT DE CÓDIGO: Solo números, máximo 6
+            const inputCodigo = document.getElementById('input-codigo');
+            if (inputCodigo) {
+                // ELIMINAR cualquier listener previo
+                inputCodigo.replaceWith(inputCodigo.cloneNode(true));
+                const nuevoInputCodigo = document.getElementById('input-codigo');
+                
+                nuevoInputCodigo.addEventListener('input', (e) => {
+                    // Solo permitir números
                     e.target.value = e.target.value.replace(/[^0-9]/g, '');
-                    
-                    // Limitar a 6 dígitos
+                    // Máximo 6 dígitos
                     if (e.target.value.length > 6) {
                         e.target.value = e.target.value.slice(0, 6);
                     }
                 });
-                codeInput.dataset.configured = 'true';
+                console.log('✅ Input código configurado: solo números');
+            }
+            
+            // INPUT DE NOMBRE: PERMITIR TODO (sin restricciones)
+            const inputNombre = document.getElementById('input-nombre');
+            if (inputNombre) {
+                // ELIMINAR cualquier listener previo
+                inputNombre.replaceWith(inputNombre.cloneNode(true));
+                console.log('✅ Input nombre: SIN restricciones');
+            }
+            
+            // INPUT DE APELLIDOS: PERMITIR TODO (sin restricciones)
+            const inputApellidos = document.getElementById('input-apellidos');
+            if (inputApellidos) {
+                // ELIMINAR cualquier listener previo
+                inputApellidos.replaceWith(inputApellidos.cloneNode(true));
+                console.log('✅ Input apellidos: SIN restricciones');
             }
         }
         
@@ -1841,12 +2102,158 @@
             }
         }
         
+        // EXPORTACIÓN CSV CON PUNTO Y COMA PARA EXCEL ESPAÑOL
+        function exportarPuntuaciones() {
+            try {
+                if (estado.conexiones.size === 0) {
+                    mostrarError('No hay alumnos conectados para exportar');
+                    return;
+                }
+                
+                // BOM para UTF-8 (asegura que Excel reconozca acentos)
+                const BOM = '\uFEFF';
+                
+                // Usar PUNTO Y COMA para Excel español
+                let csv = BOM + 'Nombre;Puntos\n';
+                
+                // Obtener y ordenar alumnos
+                const alumnosArray = Array.from(estado.conexiones.values());
+                alumnosArray.sort((a, b) => b.puntos - a.puntos);
+                
+                // Añadir cada alumno
+                alumnosArray.forEach((alumno) => {
+                    // Escapar nombre si contiene punto y coma
+                    const nombreEscapado = alumno.nombre.includes(';') 
+                        ? `"${alumno.nombre}"` 
+                        : alumno.nombre;
+                    
+                    csv += `${nombreEscapado};${alumno.puntos}\n`;
+                });
+                
+                // Crear Blob
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                
+                // Descargar
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                
+                const fecha = new Date();
+                const nombreArchivo = `Buzzer_Puntuaciones_${fecha.getFullYear()}-${String(fecha.getMonth()+1).padStart(2,'0')}-${String(fecha.getDate()).padStart(2,'0')}_${String(fecha.getHours()).padStart(2,'0')}${String(fecha.getMinutes()).padStart(2,'0')}.csv`;
+                
+                link.setAttribute('href', url);
+                link.setAttribute('download', nombreArchivo);
+                link.style.visibility = 'hidden';
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                URL.revokeObjectURL(url);
+                
+                console.log('✅ CSV exportado:', nombreArchivo);
+                mostrarMensaje('✅ Puntuaciones descargadas: ' + nombreArchivo, 'exito');
+            } catch (error) {
+                console.error('❌ Error:', error);
+                mostrarError('Error al exportar: ' + error.message);
+            }
+        }
+        
+        // EXPORTACIÓN TABLA HTML (compatible con Excel y Word)
+        function exportarPuntuacionesHTML() {
+            try {
+                if (estado.conexiones.size === 0) {
+                    mostrarError('No hay alumnos para exportar');
+                    return;
+                }
+                
+                // Crear tabla HTML
+                let html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Puntuaciones Buzzer</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h1 { color: #2C3E50; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th { background-color: #667eea; color: white; padding: 12px; text-align: left; }
+    td { border: 1px solid #ddd; padding: 10px; }
+    tr:nth-child(even) { background-color: #f5f5f5; }
+    .fecha { color: #666; font-size: 14px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Puntuaciones Buzzer Educativo</h1>
+  <p class="fecha">Código de Sesión: ${estado.peerId}</p>
+  <p class="fecha">Fecha: ${new Date().toLocaleString('es-ES')}</p>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>Posición</th>
+        <th>Nombre</th>
+        <th>Puntos</th>
+      </tr>
+    </thead>
+    <tbody>
+`;
+                
+                // Ordenar alumnos (mayor a menor: positivos primero, luego menos negativos)
+                const alumnosArray = Array.from(estado.conexiones.values());
+                alumnosArray.sort((a, b) => b.puntos - a.puntos);
+                
+                // Añadir filas
+                alumnosArray.forEach((alumno, index) => {
+                    html += `      <tr>
+        <td>${index + 1}</td>
+        <td>${alumno.nombre}</td>
+        <td>${alumno.puntos}</td>
+      </tr>
+`;
+                });
+                
+                html += `    </tbody>
+  </table>
+  
+  <p class="fecha">Total de alumnos: ${alumnosArray.length}</p>
+  <p class="fecha">Generado el ${new Date().toLocaleString('es-ES')}</p>
+</body>
+</html>`;
+                
+                // Crear Blob
+                const blob = new Blob([html], { type: 'text/html;charset=utf-8;' });
+                
+                // Descargar
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                
+                const fecha = new Date();
+                const nombreArchivo = `Buzzer_Tabla_${fecha.getFullYear()}-${String(fecha.getMonth()+1).padStart(2,'0')}-${String(fecha.getDate()).padStart(2,'0')}.html`;
+                
+                link.setAttribute('href', url);
+                link.setAttribute('download', nombreArchivo);
+                link.style.visibility = 'hidden';
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                URL.revokeObjectURL(url);
+                
+                console.log('✅ Tabla HTML exportada');
+                mostrarMensaje('✅ Tabla descargada - Ábrela con Excel o Word', 'exito');
+            } catch (error) {
+                console.error('❌ Error:', error);
+                mostrarError('Error al exportar');
+            }
+        }
+        
         // Inicialización con PeerJS
         window.addEventListener('DOMContentLoaded', () => {
             console.log('🚀 Aplicación cargada');
             
-            // Configurar input de código
-            setupCodeInput();
+            // Configurar inputs correctamente
+            setupInputs();
             
             // Verificar que PeerJS está disponible
             if (typeof Peer === 'undefined') {
@@ -1878,7 +2285,7 @@
                 if (currentScreen && currentScreen.id === 'join-session-screen') {
                     const btnConectar = document.querySelector('#join-session-screen .btn--primary');
                     if (btnConectar && !btnConectar.disabled) {
-                        joinSession();
+                        unirse();
                     }
                 }
             }
