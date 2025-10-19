@@ -1613,6 +1613,75 @@
         
 
         
+        // Función para reproducir sonido de buzzer MEJORADO
+        function reproducirSonidoBuzzer() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+                
+                // Múltiples osciladores para sonido MÁS RICO y FUERTE
+                const osc1 = audioContext.createOscillator();
+                const osc2 = audioContext.createOscillator();
+                const osc3 = audioContext.createOscillator();
+                const osc4 = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                osc1.connect(gainNode);
+                osc2.connect(gainNode);
+                osc3.connect(gainNode);
+                osc4.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                // Stack de frecuencias para sonido más LLENO y POTENTE
+                osc1.type = 'square';
+                osc1.frequency.setValueAtTime(250, audioContext.currentTime);
+                
+                osc2.type = 'sawtooth';
+                osc2.frequency.setValueAtTime(350, audioContext.currentTime);
+                
+                osc3.type = 'square';
+                osc3.frequency.setValueAtTime(500, audioContext.currentTime);
+                
+                osc4.type = 'sawtooth';
+                osc4.frequency.setValueAtTime(700, audioContext.currentTime);
+                
+                // VOLUMEN ALTO y SOSTENIDO (85% del máximo)
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.85, audioContext.currentTime + 0.02);
+                gainNode.gain.setValueAtTime(0.85, audioContext.currentTime + 0.45);
+                gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.5);
+                
+                const duracion = 0.5; // MÁS LARGO (500ms)
+                
+                osc1.start(audioContext.currentTime);
+                osc2.start(audioContext.currentTime);
+                osc3.start(audioContext.currentTime);
+                osc4.start(audioContext.currentTime);
+                
+                osc1.stop(audioContext.currentTime + duracion);
+                osc2.stop(audioContext.currentTime + duracion);
+                osc3.stop(audioContext.currentTime + duracion);
+                osc4.stop(audioContext.currentTime + duracion);
+                
+                console.log('🔊📢 Sonido GAME SHOW reproducido - MUY FUERTE');
+            } catch (error) {
+                console.error('❌ Error al reproducir sonido:', error);
+            }
+        }
+        
+        // Función para vibrar en dispositivos móviles MEJORADA
+        function vibrarDispositivo() {
+            if ('vibrate' in navigator) {
+                // Vibración MÁS LARGA y MÁS INTENSA
+                // [vibrar 200ms, pausa 50ms, vibrar 200ms]
+                navigator.vibrate([200, 50, 200]);
+                console.log('📱 Vibración INTENSA activada');
+            }
+        }
+        
         // ALUMNO: Presionar buzzer
         function pressBuzzer() {
             if (!estado.rondaActiva || estado.buzzerPresionado) {
@@ -1620,6 +1689,23 @@
             }
             
             estado.buzzerPresionado = true;
+            
+            const boton = document.getElementById('buzzer-button');
+            
+            // ANIMACIÓN: Escalar y rotar
+            boton.style.transform = 'scale(0.9) rotate(5deg)';
+            setTimeout(() => {
+                boton.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    boton.style.transform = 'scale(1)';
+                }, 100);
+            }, 100);
+            
+            // REPRODUCIR SONIDO
+            reproducirSonidoBuzzer();
+            
+            // VIBRAR
+            vibrarDispositivo();
             
             // Enviar buzzer al profesor
             try {
@@ -1630,7 +1716,6 @@
                 });
                 
                 // Deshabilitar botón y actualizar UI
-                const boton = document.getElementById('buzzer-button');
                 const statusEl = document.getElementById('buzzer-status');
                 const waitingMsg = document.getElementById('session-waiting-message');
                 
@@ -1641,7 +1726,9 @@
                 waitingMsg.innerHTML = '<span class="emoji">✅</span> ¡Buzzer presionado correctamente!';
                 waitingMsg.style.display = 'block';
                 
-                console.log('🔔 Buzzer presionado');
+                console.log('🔔 Buzzer presionado con sonido y vibración');
+                console.log('🔊 Sonido:', window.AudioContext || window.webkitAudioContext ? 'Disponible' : 'No disponible');
+                console.log('📱 Vibración:', 'vibrate' in navigator ? 'Soportada' : 'No soportada');
                 
             } catch (error) {
                 console.error('Error al presionar buzzer:', error);
