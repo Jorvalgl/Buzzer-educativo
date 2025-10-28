@@ -1284,7 +1284,8 @@ Actualizaciones en: https://github.com/Jorvalgl
             // Profesor
             peerProfesor: null,
             peerId: '',
-            conexiones: new Map(),
+            conexiones: new Map(), // Solo alumnos ACTUALMENTE conectados
+            historialAlumnos: new Map(), // TODOS los alumnos (incluye desconectados)
             rondaActiva: false,
             buzzers: [],
             ultimaBroadcast: 0, // Timestamp del último broadcast
@@ -1397,6 +1398,7 @@ Actualizaciones en: https://github.com/Jorvalgl
             
             // Resetear estado
             estado.conexiones.clear();
+            estado.historialAlumnos.clear();
             estado.buzzers = [];
             estado.rondaActiva = false;
             estado.peerId = '';
@@ -1594,10 +1596,16 @@ Actualizaciones en: https://github.com/Jorvalgl
                         manejarMensajeAlumno(conn, data);
                     });
                     
+                    // EVENTO CLOSE: Alumno se desconecta
                     conn.on('close', () => {
-                        // Remover alumno de la lista
-                        estado.conexiones.delete(conn.peer);
-                        actualizarListaAlumnos();
+                        console.log('🚪 Conexión cerrada:', conn.peer);
+                        manejarDesconexion(conn.peer);
+                    });
+                    
+                    // EVENTO ERROR: También considerar como desconexión
+                    conn.on('error', (err) => {
+                        console.error('❌ Error en conexión:', conn.peer, err);
+                        manejarDesconexion(conn.peer);
                     });
                 });
                 
@@ -1635,18 +1643,79 @@ Actualizaciones en: https://github.com/Jorvalgl
             }
         }
         
+        // PROFESOR: Registrar alumno con historial
+        function registrarAlumno(conn, nombre) {
+            const alumnoId = conn.peer;
+            const ahora = Date.now();
+            
+            // Datos del alumno
+            const datosAlumno = {
+                alumnoId: alumnoId,
+                nombre: nombre,
+                puntos: 0,
+                horaConexion: ahora,
+                horaDesconexion: null,
+                conectado: true,
+                conn: conn
+            };
+            
+            // Añadir a conexiones activas
+            estado.conexiones.set(alumnoId, datosAlumno);
+            
+            // Añadir a historial (o actualizar si ya existía)
+            estado.historialAlumnos.set(alumnoId, datosAlumno);
+            
+            console.log('👤 Alumno registrado:', nombre);
+            console.log('📊 Activos:', estado.conexiones.size, '| Total histórico:', estado.historialAlumnos.size);
+            
+            actualizarListaAlumnos();
+        }
+        
+        // PROFESOR: Manejar desconexión de alumno
+        function manejarDesconexion(alumnoId) {
+            const alumno = estado.conexiones.get(alumnoId);
+            
+            if (!alumno) {
+                console.log('⚠️ Intento de desconectar alumno no encontrado:', alumnoId);
+                return;
+            }
+            
+            const ahora = Date.now();
+            
+            console.log('🚪 Alumno desconectado:', alumno.nombre);
+            
+            // Actualizar datos en historial
+            const datosHistorial = estado.historialAlumnos.get(alumnoId);
+            if (datosHistorial) {
+                datosHistorial.horaDesconexion = ahora;
+                datosHistorial.conectado = false;
+                datosHistorial.conn = null; // Limpiar referencia a conexión
+                
+                const duracionConexion = ahora - datosHistorial.horaConexion;
+                const minutos = Math.floor(duracionConexion / 60000);
+                const segundos = Math.floor((duracionConexion % 60000) / 1000);
+                
+                console.log(`⏱️ Duración de conexión: ${minutos}m ${segundos}s`);
+            }
+            
+            // ELIMINAR de conexiones activas (desaparece de la lista visible)
+            estado.conexiones.delete(alumnoId);
+            
+            console.log('📊 Activos:', estado.conexiones.size, '| Total histórico:', estado.historialAlumnos.size);
+            
+            // Actualizar lista visible (ya no aparecerá)
+            actualizarListaAlumnos();
+            
+            // Mensaje informativo al profesor
+            mostrarMensaje(`🚪 ${alumno.nombre} se ha desconectado`, 'info');
+        }
+        
         // PROFESOR: Manejar mensajes de alumnos
         function manejarMensajeAlumno(conn, data) {
             switch(data.tipo) {
                 case 'conectar':
-                    // Guardar alumno en la lista
-                    estado.conexiones.set(conn.peer, {
-                        conn: conn,
-                        nombre: data.nombre,
-                        puntos: 0,  // Empezar en 0, puede bajar a negativos
-                        ultimaActividad: Date.now() // Timestamp de última actividad
-                    });
-                    actualizarListaAlumnos();
+                    // Registrar alumno (incluye en historial)
+                    registrarAlumno(conn, data.nombre);
                     console.log('✅ Alumno conectado:', data.nombre);
                     break;
                     
@@ -1663,19 +1732,22 @@ Actualizaciones en: https://github.com/Jorvalgl
             }
         }
         
-        // PROFESOR: Actualizar lista de alumnos con contador visual
+        // PROFESOR: Actualizar lista de alumnos (SOLO ACTIVOS)
         function actualizarListaAlumnos() {
-            const num = estado.conexiones.size;
+            const activos = estado.conexiones.size;
+            const total = estado.historialAlumnos.size;
+            const desconectados = total - activos;
+            
             const elemContador = document.getElementById('student-count');
-            elemContador.textContent = num;
+            elemContador.textContent = activos;
             
             // Advertencia visual si hay muchos alumnos
-            if (num > 50) {
+            if (activos > 50) {
                 elemContador.style.color = '#FF5252'; // Rojo
-                if (num % 10 === 0) { // Mostrar advertencia cada 10 alumnos
-                    mostrarError(`Hay ${num} alumnos. Con más de 50 puede haber lentitud.`);
+                if (activos % 10 === 0) { // Mostrar advertencia cada 10 alumnos
+                    mostrarError(`Hay ${activos} alumnos. Con más de 50 puede haber lentitud.`);
                 }
-            } else if (num > 30) {
+            } else if (activos > 30) {
                 elemContador.style.color = '#FF9800'; // Naranja
             } else {
                 elemContador.style.color = '#4CAF50'; // Verde
@@ -1684,6 +1756,15 @@ Actualizaciones en: https://github.com/Jorvalgl
             const lista = document.getElementById('students-container');
             lista.innerHTML = '';
             
+            // Mensaje adicional si hay desconectados
+            if (desconectados > 0) {
+                const infoDesconectados = document.createElement('p');
+                infoDesconectados.style.cssText = 'color: #666 !important; font-size: 14px; margin: 10px 0; text-align: center; background: #FFF3E0; padding: 10px; border-radius: 8px; border: 1px solid #FFB74D;';
+                infoDesconectados.textContent = `ℹ️ ${desconectados} alumno${desconectados > 1 ? 's' : ''} desconectado${desconectados > 1 ? 's' : ''} (se incluirán en la exportación)`;
+                lista.appendChild(infoDesconectados);
+            }
+            
+            // Mostrar SOLO alumnos actualmente conectados
             estado.conexiones.forEach((alumno, id) => {
                 const div = document.createElement('div');
                 div.className = 'student-item';
@@ -1697,6 +1778,7 @@ Actualizaciones en: https://github.com/Jorvalgl
                 div.innerHTML = `
                     <div>
                         <span class="student-name">👨‍🎓 ${alumno.nombre}</span>
+                        <span style="color: #4CAF50; font-size: 12px; margin-left: 8px;">● Conectado</span>
                     </div>
                     <div class="score-controls">
                         <span class="student-score" style="${puntosColor}">${puntosTexto} pts</span>
@@ -1709,8 +1791,8 @@ Actualizaciones en: https://github.com/Jorvalgl
                 lista.appendChild(div);
             });
             
-            if (num === 0) {
-                lista.innerHTML = '<p style="color: #6c757d !important; text-align: center;">No hay alumnos conectados</p>';
+            if (activos === 0) {
+                lista.innerHTML = '<p style="color: #6c757d !important; text-align: center; padding: 20px;">No hay alumnos conectados actualmente</p>';
             }
         }
 
@@ -1870,24 +1952,37 @@ Actualizaciones en: https://github.com/Jorvalgl
         // PROFESOR: Dar puntos - PERMITIR PUNTOS NEGATIVOS
         function darPuntos(alumnoId, puntos) {
             const alumno = estado.conexiones.get(alumnoId);
-            if (alumno) {
-                // PERMITIR puntos negativos (eliminar Math.max)
-                alumno.puntos += puntos;
-                
-                console.log(`⭐ ${alumno.nombre}: ${alumno.puntos} puntos`);
-                
-                // Enviar actualización al alumno
+            
+            if (!alumno) {
+                console.warn('⚠️ Intento de dar puntos a alumno no conectado:', alumnoId);
+                mostrarError('Este alumno ya no está conectado');
+                return;
+            }
+            
+            // Actualizar puntos
+            alumno.puntos += puntos;
+            
+            console.log(`⭐ ${alumno.nombre}: ${alumno.puntos} puntos`);
+            
+            // Actualizar también en historial
+            const datosHistorial = estado.historialAlumnos.get(alumnoId);
+            if (datosHistorial) {
+                datosHistorial.puntos = alumno.puntos;
+            }
+            
+            // Enviar actualización al alumno (si sigue conectado)
+            if (alumno.conn && alumno.conn.open) {
                 try {
                     alumno.conn.send({
                         tipo: 'actualizar_puntos',
                         puntos: alumno.puntos
                     });
                 } catch (error) {
-                    console.error('Error enviando puntos a', alumno.nombre, error);
+                    console.error('❌ Error enviando puntos:', error);
                 }
-                
-                actualizarListaAlumnos();
             }
+            
+            actualizarListaAlumnos();
         }
         
 
@@ -2328,38 +2423,58 @@ Actualizaciones en: https://github.com/Jorvalgl
             }
         }
         
-        // EXPORTACIÓN CSV CON PUNTO Y COMA PARA EXCEL ESPAÑOL
+        // EXPORTACIÓN CSV CON HISTORIAL COMPLETO
         function exportarPuntuaciones() {
             try {
-                if (estado.conexiones.size === 0) {
-                    mostrarError('No hay alumnos conectados para exportar');
+                if (estado.historialAlumnos.size === 0) {
+                    mostrarError('No hay alumnos para exportar (ni actuales ni históricos)');
                     return;
                 }
                 
-                // BOM para UTF-8 (asegura que Excel reconozca acentos)
                 const BOM = '\uFEFF';
                 
-                // Usar PUNTO Y COMA para Excel español
-                let csv = BOM + 'Nombre;Puntos\n';
+                // Encabezados ampliados
+                let csv = BOM + 'Nombre;Puntos;Estado;Hora Conexión;Hora Desconexión;Duración\n';
                 
-                // Obtener y ordenar alumnos
-                const alumnosArray = Array.from(estado.conexiones.values());
+                // Convertir historial a array y ordenar por puntos
+                const alumnosArray = Array.from(estado.historialAlumnos.values());
                 alumnosArray.sort((a, b) => b.puntos - a.puntos);
                 
-                // Añadir cada alumno
+                // Añadir cada alumno del historial
                 alumnosArray.forEach((alumno) => {
-                    // Escapar nombre si contiene punto y coma
                     const nombreEscapado = alumno.nombre.includes(';') 
                         ? `"${alumno.nombre}"` 
                         : alumno.nombre;
                     
-                    csv += `${nombreEscapado};${alumno.puntos}\n`;
+                    const estado_texto = alumno.conectado ? 'Conectado' : 'Desconectado';
+                    
+                    const horaConexion = new Date(alumno.horaConexion).toLocaleString('es-ES');
+                    const horaDesconexion = alumno.horaDesconexion 
+                        ? new Date(alumno.horaDesconexion).toLocaleString('es-ES')
+                        : '-';
+                    
+                    // Calcular duración
+                    let duracion = '-';
+                    if (alumno.horaDesconexion) {
+                        const duracionMs = alumno.horaDesconexion - alumno.horaConexion;
+                        const minutos = Math.floor(duracionMs / 60000);
+                        const segundos = Math.floor((duracionMs % 60000) / 1000);
+                        duracion = `${minutos}m ${segundos}s`;
+                    } else if (alumno.conectado) {
+                        duracion = 'Aún conectado';
+                    }
+                    
+                    csv += `${nombreEscapado};${alumno.puntos};${estado_texto};${horaConexion};${horaDesconexion};${duracion}\n`;
                 });
                 
-                // Crear Blob
-                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                // Estadísticas al final
+                csv += '\n';
+                csv += `Total alumnos;${estado.historialAlumnos.size}\n`;
+                csv += `Conectados;${estado.conexiones.size}\n`;
+                csv += `Desconectados;${estado.historialAlumnos.size - estado.conexiones.size}\n`;
                 
-                // Descargar
+                // Crear Blob y descargar
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
                 const link = document.createElement('a');
                 const url = URL.createObjectURL(blob);
                 
@@ -2376,25 +2491,24 @@ Actualizaciones en: https://github.com/Jorvalgl
                 
                 URL.revokeObjectURL(url);
                 
-                console.log('✅ CSV exportado:', nombreArchivo);
+                console.log('📊 CSV exportado con historial completo:', nombreArchivo);
                 mostrarMensaje('✅ Puntuaciones descargadas: ' + nombreArchivo, 'exito');
             } catch (error) {
-                console.error('❌ Error:', error);
+                console.error('❌ Error al exportar:', error);
                 mostrarError('Error al exportar: ' + error.message);
             }
         }
         
-        // EXPORTACIÓN TABLA HTML (compatible con Excel y Word)
+        // EXPORTACIÓN HTML CON HISTORIAL COMPLETO
         function exportarPuntuacionesHTML() {
             try {
-                if (estado.conexiones.size === 0) {
+                if (estado.historialAlumnos.size === 0) {
                     mostrarError('No hay alumnos para exportar');
                     return;
                 }
                 
-                // Crear tabla HTML
                 let html = `<!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <title>Puntuaciones Buzzer</title>
@@ -2405,11 +2519,14 @@ Actualizaciones en: https://github.com/Jorvalgl
     th { background-color: #667eea; color: white; padding: 12px; text-align: left; }
     td { border: 1px solid #ddd; padding: 10px; }
     tr:nth-child(even) { background-color: #f5f5f5; }
+    .conectado { color: #4CAF50; font-weight: bold; }
+    .desconectado { color: #999; }
     .fecha { color: #666; font-size: 14px; margin-top: 10px; }
+    .estadisticas { background: #f9f9f9; padding: 15px; border-radius: 8px; margin-top: 20px; }
   </style>
 </head>
 <body>
-  <h1>Puntuaciones Buzzer Educativo</h1>
+  <h1>📊 Puntuaciones Buzzer Educativo</h1>
   <p class="fecha">Código de Sesión: ${estado.peerId}</p>
   <p class="fecha">Fecha: ${new Date().toLocaleString('es-ES')}</p>
   
@@ -2419,37 +2536,68 @@ Actualizaciones en: https://github.com/Jorvalgl
         <th>Posición</th>
         <th>Nombre</th>
         <th>Puntos</th>
+        <th>Estado</th>
+        <th>Hora Conexión</th>
+        <th>Hora Desconexión</th>
+        <th>Duración</th>
       </tr>
     </thead>
     <tbody>
 `;
                 
-                // Ordenar alumnos (mayor a menor: positivos primero, luego menos negativos)
-                const alumnosArray = Array.from(estado.conexiones.values());
+                const alumnosArray = Array.from(estado.historialAlumnos.values());
                 alumnosArray.sort((a, b) => b.puntos - a.puntos);
                 
-                // Añadir filas
                 alumnosArray.forEach((alumno, index) => {
+                    const estadoClass = alumno.conectado ? 'conectado' : 'desconectado';
+                    const estadoTexto = alumno.conectado ? '● Conectado' : '○ Desconectado';
+                    
+                    const horaConexion = new Date(alumno.horaConexion).toLocaleTimeString('es-ES');
+                    const horaDesconexion = alumno.horaDesconexion 
+                        ? new Date(alumno.horaDesconexion).toLocaleTimeString('es-ES')
+                        : '-';
+                    
+                    let duracion = '-';
+                    if (alumno.horaDesconexion) {
+                        const duracionMs = alumno.horaDesconexion - alumno.horaConexion;
+                        const minutos = Math.floor(duracionMs / 60000);
+                        const segundos = Math.floor((duracionMs % 60000) / 1000);
+                        duracion = `${minutos}m ${segundos}s`;
+                    } else if (alumno.conectado) {
+                        duracion = 'Aún conectado';
+                    }
+                    
                     html += `      <tr>
         <td>${index + 1}</td>
         <td>${alumno.nombre}</td>
-        <td>${alumno.puntos}</td>
+        <td style="font-weight: bold;">${alumno.puntos}</td>
+        <td class="${estadoClass}">${estadoTexto}</td>
+        <td>${horaConexion}</td>
+        <td>${horaDesconexion}</td>
+        <td>${duracion}</td>
       </tr>
 `;
                 });
                 
+                const totalAlumnos = estado.historialAlumnos.size;
+                const conectados = estado.conexiones.size;
+                const desconectados = totalAlumnos - conectados;
+                
                 html += `    </tbody>
   </table>
   
-  <p class="fecha">Total de alumnos: ${alumnosArray.length}</p>
+  <div class="estadisticas">
+    <h3>📈 Estadísticas de la Sesión</h3>
+    <p><strong>Total de alumnos:</strong> ${totalAlumnos}</p>
+    <p><strong>Actualmente conectados:</strong> ${conectados}</p>
+    <p><strong>Desconectados:</strong> ${desconectados}</p>
+  </div>
+  
   <p class="fecha">Generado el ${new Date().toLocaleString('es-ES')}</p>
 </body>
 </html>`;
                 
-                // Crear Blob
                 const blob = new Blob([html], { type: 'text/html;charset=utf-8;' });
-                
-                // Descargar
                 const link = document.createElement('a');
                 const url = URL.createObjectURL(blob);
                 
@@ -2466,10 +2614,10 @@ Actualizaciones en: https://github.com/Jorvalgl
                 
                 URL.revokeObjectURL(url);
                 
-                console.log('✅ Tabla HTML exportada');
+                console.log('📊 HTML exportado con historial completo');
                 mostrarMensaje('✅ Tabla descargada - Ábrela con Excel o Word', 'exito');
             } catch (error) {
-                console.error('❌ Error:', error);
+                console.error('❌ Error al exportar:', error);
                 mostrarError('Error al exportar');
             }
         }
