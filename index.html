@@ -1287,6 +1287,8 @@ Actualizaciones en: https://github.com/Jorvalgl
             conexiones: new Map(),
             rondaActiva: false,
             buzzers: [],
+            ultimaBroadcast: 0, // Timestamp del último broadcast
+            THROTTLE_MS: 100, // Mínimo 100ms entre broadcasts
             
             // Alumno
             peerAlumno: null,
@@ -1295,6 +1297,71 @@ Actualizaciones en: https://github.com/Jorvalgl
             misPuntos: 0,
             buzzerPresionado: false
         };
+        
+        // Detectar Safari/iOS
+        function isSafari() {
+            const ua = navigator.userAgent;
+            return /^((?!chrome|android).)*safari/i.test(ua) || 
+                   /iPad|iPhone|iPod/.test(ua);
+        }
+        
+        // Configuración robusta con múltiples servidores STUN y TURN
+        function obtenerConfiguracionICE() {
+            return {
+                iceServers: [
+                    // Servidores STUN (gratis, públicos)
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    { urls: 'stun:stun1.l.google.com:19302' },
+                    { urls: 'stun:stun2.l.google.com:19302' },
+                    { urls: 'stun:stun3.l.google.com:19302' },
+                    { urls: 'stun:stun4.l.google.com:19302' },
+                    
+                    // Servidor TURN público de OpenRelay (gratis, sin autenticación)
+                    {
+                        urls: 'turn:openrelay.metered.ca:80',
+                        username: 'openrelayproject',
+                        credential: 'openrelayproject'
+                    },
+                    {
+                        urls: 'turn:openrelay.metered.ca:443',
+                        username: 'openrelayproject',
+                        credential: 'openrelayproject'
+                    },
+                    {
+                        urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+                        username: 'openrelayproject',
+                        credential: 'openrelayproject'
+                    },
+                    
+                    // Servidor TURN alternativo (Twilio STUN)
+                    { urls: 'stun:global.stun.twilio.com:3478' }
+                ],
+                
+                // Configuración adicional para mejor conectividad
+                iceTransportPolicy: 'all', // Intentar todas las opciones (relay si es necesario)
+                iceCandidatePoolSize: 10 // Pool más grande para mejor conectividad
+            };
+        }
+        
+        // Crear Peer con configuración compatible iOS y TURN
+        function crearPeerCompatible(id) {
+            const esSafari = isSafari();
+            
+            const config = {
+                debug: 2,
+                config: obtenerConfiguracionICE() // ← Usar configuración con TURN
+            };
+            
+            // Configuración específica para Safari iOS
+            if (esSafari) {
+                console.log('🍎 Safari/iOS detectado - Configuración especial');
+                config.serialization = 'json';
+            }
+            
+            console.log('🌐 ICE Servers configurados:', config.config.iceServers.length);
+            
+            return id ? new Peer(id, config) : new Peer(config);
+        }
         
         // Funciones de navegación
         function mostrarPantalla(pantallaId) {
@@ -1397,15 +1464,29 @@ Actualizaciones en: https://github.com/Jorvalgl
             }
         }
         
-        // Función para inicializar AudioContext
+        // Función para inicializar AudioContext compatible iOS
         function inicializarAudio() {
             if (!audioContextGlobal) {
-                audioContextGlobal = new (window.AudioContext || window.webkitAudioContext)();
-                console.log('🎵 AudioContext creado');
+                try {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    audioContextGlobal = new AudioContext();
+                    
+                    // iOS requiere resumir el contexto después de interacción
+                    if (audioContextGlobal.state === 'suspended') {
+                        audioContextGlobal.resume().then(() => {
+                            console.log('🎵 AudioContext reanudado (iOS)');
+                        });
+                    }
+                    
+                    console.log('🎵 AudioContext creado');
+                } catch (error) {
+                    console.error('❌ Error creando AudioContext:', error);
+                    return null;
+                }
             }
             
             // Reanudar si está suspendido
-            if (audioContextGlobal.state === 'suspended') {
+            if (audioContextGlobal && audioContextGlobal.state === 'suspended') {
                 audioContextGlobal.resume().then(() => {
                     console.log('🎵 AudioContext reanudado');
                 });
@@ -1413,6 +1494,14 @@ Actualizaciones en: https://github.com/Jorvalgl
             
             return audioContextGlobal;
         }
+        
+        // Asegurar que el audio funciona en iOS con touch
+        document.addEventListener('touchstart', () => {
+            const ctx = inicializarAudio();
+            if (ctx && ctx.state === 'suspended') {
+                ctx.resume();
+            }
+        }, { once: true });
         
 
         
@@ -1455,7 +1544,7 @@ Actualizaciones en: https://github.com/Jorvalgl
             return Math.floor(100000 + Math.random() * 900000).toString();
         }
         
-        // PROFESOR: Crear sesión con PeerJS
+        // PROFESOR: Crear sesión con PeerJS y TURN
         async function crearSesionAutomatica() {
             try {
                 mostrarMensaje('Generando código de sesión...', 'info');
@@ -1464,19 +1553,28 @@ Actualizaciones en: https://github.com/Jorvalgl
                 const codigoCorto = generarCodigoCorto();
                 console.log('🔢 Código generado:', codigoCorto);
                 
-                // Crear peer del profesor con ID personalizado (código corto)
-                estado.peerProfesor = new Peer(codigoCorto, {
-                    debug: 2  // Nivel de debug para ver mensajes en consola
-                });
+                // Crear peer del profesor con configuración TURN
+                estado.peerProfesor = crearPeerCompatible(codigoCorto);
                 
                 estado.peerProfesor.on('open', (id) => {
                     estado.peerId = id;
-                    console.log('✅ Peer ID personalizado:', id);
+                    console.log('✅ Peer ID del profesor:', id);
+                    console.log('📱 Servidor TURN configurado - Funciona desde móvil');
                     
                     // Mostrar código de sesión (ahora es solo 6 dígitos)
                     document.getElementById('session-code-display').textContent = id;
                     
                     mostrarMensaje('✅ Sesión creada: ' + id, 'exito');
+                    
+                    // Detectar tipo de conexión
+                    if (navigator.connection) {
+                        const tipo = navigator.connection.effectiveType;
+                        console.log('📶 Tipo de conexión:', tipo);
+                        if (tipo === '4g' || tipo === '3g' || tipo === 'slow-2g' || tipo === '2g') {
+                            console.log('📱 Conectado desde datos móviles - Usando TURN relay');
+                            mostrarMensaje('ℹ️ Conectado desde móvil - Puede tardar un poco más', 'info');
+                        }
+                    }
                 });
                 
                 // Escuchar conexiones entrantes de alumnos
@@ -1504,23 +1602,29 @@ Actualizaciones en: https://github.com/Jorvalgl
                 });
                 
                 estado.peerProfesor.on('error', (err) => {
-                    console.error('❌ Error de PeerJS:', err);
+                    console.error('❌ Error de PeerJS (Profesor):', err);
                     
                     if (err.type === 'unavailable-id') {
-                        // El código ya está en uso, generar uno nuevo
-                        console.log('⚠️ Código en uso, generando nuevo...');
-                        
-                        // Cerrar peer actual
-                        if (estado.peerProfesor) {
-                            estado.peerProfesor.destroy();
-                        }
-                        
-                        // Reintentar con nuevo código
+                        mostrarError('El código ya está en uso. Generando uno nuevo...');
                         setTimeout(() => {
+                            if (estado.peerProfesor) {
+                                estado.peerProfesor.destroy();
+                            }
                             crearSesionAutomatica();
                         }, 1000);
+                    } else if (err.type === 'network') {
+                        mostrarError('Error de red. Verifica tu conexión a internet.');
+                    } else if (err.type === 'server-error') {
+                        mostrarError('Error del servidor PeerJS. Intenta de nuevo.');
                     } else {
-                        mostrarError('Error de conexión: ' + err.message);
+                        mostrarError('Error: ' + err.message);
+                    }
+                });
+                
+                // Log de ICE candidates para debugging
+                estado.peerProfesor.on('icecandidate', (candidate) => {
+                    if (candidate) {
+                        console.log('🧊 ICE Candidate:', candidate.type, candidate.protocol);
                     }
                 });
                 
@@ -1539,7 +1643,8 @@ Actualizaciones en: https://github.com/Jorvalgl
                     estado.conexiones.set(conn.peer, {
                         conn: conn,
                         nombre: data.nombre,
-                        puntos: 0  // Empezar en 0, puede bajar a negativos
+                        puntos: 0,  // Empezar en 0, puede bajar a negativos
+                        ultimaActividad: Date.now() // Timestamp de última actividad
                     });
                     actualizarListaAlumnos();
                     console.log('✅ Alumno conectado:', data.nombre);
@@ -1558,10 +1663,23 @@ Actualizaciones en: https://github.com/Jorvalgl
             }
         }
         
-        // PROFESOR: Actualizar lista de alumnos - MOSTRAR PUNTOS NEGATIVOS
+        // PROFESOR: Actualizar lista de alumnos con contador visual
         function actualizarListaAlumnos() {
             const num = estado.conexiones.size;
-            document.getElementById('student-count').textContent = num;
+            const elemContador = document.getElementById('student-count');
+            elemContador.textContent = num;
+            
+            // Advertencia visual si hay muchos alumnos
+            if (num > 50) {
+                elemContador.style.color = '#FF5252'; // Rojo
+                if (num % 10 === 0) { // Mostrar advertencia cada 10 alumnos
+                    mostrarError(`Hay ${num} alumnos. Con más de 50 puede haber lentitud.`);
+                }
+            } else if (num > 30) {
+                elemContador.style.color = '#FF9800'; // Naranja
+            } else {
+                elemContador.style.color = '#4CAF50'; // Verde
+            }
             
             const lista = document.getElementById('students-container');
             lista.innerHTML = '';
@@ -1637,16 +1755,65 @@ Actualizaciones en: https://github.com/Jorvalgl
             }
         }
 
-        // PROFESOR: Broadcast mensaje a todos los alumnos
+        // PROFESOR: Broadcast con throttling (evitar spam)
         function broadcast(mensaje) {
+            const ahora = Date.now();
+            
+            // Throttle: no enviar si ya se envió hace menos de 100ms
+            if (ahora - estado.ultimaBroadcast < estado.THROTTLE_MS) {
+                console.log('⚠️ Broadcast throttled');
+                return;
+            }
+            
+            estado.ultimaBroadcast = ahora;
+            
+            let enviados = 0;
+            let errores = 0;
+            
             estado.conexiones.forEach((alumno) => {
                 try {
-                    alumno.conn.send(mensaje);
+                    if (alumno.conn && alumno.conn.open) {
+                        alumno.conn.send(mensaje);
+                        enviados++;
+                        // Actualizar timestamp de última actividad
+                        alumno.ultimaActividad = ahora;
+                    }
                 } catch (error) {
-                    console.error('Error enviando a', alumno.nombre, error);
+                    console.error('❌ Error enviando a', alumno.nombre, error);
+                    errores++;
                 }
             });
+            
+            console.log(`📡 Broadcast enviado a ${enviados} alumnos (${errores} errores)`);
         }
+        
+        // Limpiar conexiones que no responden
+        function limpiarConexionesMuertas() {
+            const ahora = Date.now();
+            const TIMEOUT = 60000; // 1 minuto sin actividad
+            
+            let eliminadas = 0;
+            
+            estado.conexiones.forEach((alumno, id) => {
+                if (!alumno.conn || !alumno.conn.open) {
+                    console.log('🗑️ Eliminando conexión muerta:', alumno.nombre);
+                    estado.conexiones.delete(id);
+                    eliminadas++;
+                } else if (alumno.ultimaActividad && (ahora - alumno.ultimaActividad > TIMEOUT)) {
+                    console.log('⏱️ Eliminando conexión inactiva:', alumno.nombre);
+                    estado.conexiones.delete(id);
+                    eliminadas++;
+                }
+            });
+            
+            if (eliminadas > 0) {
+                console.log(`🗑️ ${eliminadas} conexiones eliminadas`);
+                actualizarListaAlumnos();
+            }
+        }
+        
+        // Ejecutar limpieza cada 30 segundos
+        setInterval(limpiarConexionesMuertas, 30000);
         
 
         
@@ -1789,34 +1956,37 @@ Actualizaciones en: https://github.com/Jorvalgl
             try {
                 mostrarMensaje('Conectando...', 'info');
                 
-                // Crear peer del alumno
-                estado.peerAlumno = new Peer();
+                // Crear peer del alumno CON TURN
+                estado.peerAlumno = crearPeerCompatible();
                 
                 estado.peerAlumno.on('open', (id) => {
                     console.log('🔑 Mi Peer ID:', id);
+                    console.log('🌐 Intentando conectar al profesor con TURN relay...');
                     
-                    // Conectar al profesor usando el código de 6 dígitos
+                    // Conectar al profesor
+                    const esSafari = isSafari();
                     estado.conexionProfesor = estado.peerAlumno.connect(codigoInput, {
-                        reliable: true  // Conexión confiable
+                        reliable: true,
+                        serialization: esSafari ? 'json' : 'binary'
                     });
                     
-                    // Timeout de conexión
+                    // Timeout de 15 segundos (más tiempo por TURN)
                     const timeout = setTimeout(() => {
                         if (!estado.conexionProfesor || !estado.conexionProfesor.open) {
-                            mostrarError('Timeout: No se pudo conectar. Verifica el código.');
+                            mostrarError('Timeout: No se pudo conectar. Verifica el código o tu conexión.');
                             btnConectar.disabled = false;
                             btnConectar.textContent = textoOriginal;
                         }
-                    }, 10000); // 10 segundos de timeout
+                    }, 15000); // 15 segundos para TURN
                     
                     estado.conexionProfesor.on('open', () => {
                         clearTimeout(timeout);
                         console.log('✅ Conectado al profesor');
                         
-                        // Enviar mensaje de conexión con nombre completo
+                        // Enviar nombre completo
                         estado.conexionProfesor.send({
                             tipo: 'conectar',
-                            nombre: nombreCompleto,  // ← "María García" con espacio automático
+                            nombre: nombreCompleto,
                             alumnoId: id
                         });
                         
@@ -1829,8 +1999,7 @@ Actualizaciones en: https://github.com/Jorvalgl
                         mostrarPantalla('student-screen');
                         
                         mostrarMensaje('✅ Conectado como: ' + nombreCompleto, 'exito');
-                        
-                        console.log('🎉 Nombre enviado al profesor:', nombreCompleto);
+                        console.log('🎉 Conexión establecida (puede ser vía TURN relay)');
                         
                         btnConectar.disabled = false;
                         btnConectar.textContent = textoOriginal;
@@ -1858,8 +2027,18 @@ Actualizaciones en: https://github.com/Jorvalgl
                 });
                 
                 estado.peerAlumno.on('error', (err) => {
-                    console.error('❌ Error de PeerJS:', err);
-                    mostrarError('Error: ' + err.message);
+                    console.error('❌ Error de PeerJS (Alumno):', err);
+                    
+                    if (err.type === 'peer-unavailable') {
+                        mostrarError('El profesor no está disponible. Verifica el código.');
+                    } else if (err.type === 'network') {
+                        mostrarError('Error de red. Verifica tu conexión a internet.');
+                    } else if (err.type === 'webrtc') {
+                        mostrarError('Error de WebRTC. Intenta actualizar tu navegador.');
+                    } else {
+                        mostrarError('Error: ' + err.message);
+                    }
+                    
                     btnConectar.disabled = false;
                     btnConectar.textContent = textoOriginal;
                 });
@@ -2295,23 +2474,50 @@ Actualizaciones en: https://github.com/Jorvalgl
             }
         }
         
-        // Inicialización con PeerJS
-        window.addEventListener('DOMContentLoaded', () => {
-            console.log('🚀 Aplicación cargada');
+        // Mostrar información del sistema
+        function mostrarInfoSistema() {
+            const navegador = isSafari() ? '🍎 Safari/iOS' : 
+                            /Chrome/.test(navigator.userAgent) ? '🔷 Chrome' :
+                            /Firefox/.test(navigator.userAgent) ? '🦊 Firefox' :
+                            '🌐 Otro navegador';
             
-            // Configurar inputs correctamente
-            setupInputs();
+            console.log(`📱 Navegador detectado: ${navegador}`);
+            console.log(`📊 Conexiones WebRTC disponibles: ${window.RTCPeerConnection ? 'Sí' : 'No'}`);
+            console.log(`🔊 Audio disponible: ${window.AudioContext || window.webkitAudioContext ? 'Sí' : 'No'}`);
+            console.log(`📳 Vibración disponible: ${'vibrate' in navigator ? 'Sí' : 'No'}`);
+        }
+        
+        // Inicialización robusta con PeerJS
+        window.addEventListener('DOMContentLoaded', async () => {
+            console.log('🚀 Iniciando aplicación...');
+            console.log('📱 Navegador:', navigator.userAgent);
+            console.log('🍎 Safari:', isSafari());
             
-            // Verificar que PeerJS está disponible
+            // Verificar soporte WebRTC
+            if (!window.RTCPeerConnection) {
+                mostrarError('Tu navegador no soporta WebRTC. Actualiza a la última versión.');
+                return;
+            }
+            
+            console.log('✅ WebRTC soportado');
+            
+            // Verificar PeerJS
             if (typeof Peer === 'undefined') {
                 console.error('❌ PeerJS no cargado');
                 mostrarError('Error: PeerJS no disponible. Recarga la página.');
-            } else {
-                console.log('✅ PeerJS cargado');
+                return;
             }
             
-            // NO crear AudioContext aquí (esperamos interacción del usuario)
-            console.log('ℹ️ Audio se inicializará con la primera interacción');
+            console.log('✅ PeerJS cargado');
+            
+            // Configurar inputs
+            setupInputs();
+            
+            // Mostrar información del sistema
+            mostrarInfoSistema();
+            
+            // Inicializar audio (importante para iOS)
+            console.log('ℹ️ Audio se inicializará con la primera interacción del usuario');
             
             mostrarMensaje('✅ Sistema listo', 'exito');
         });
